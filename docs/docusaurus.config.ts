@@ -14,7 +14,6 @@ const config: Config = {
   // GitHub pages deployment config.
   organizationName: 'scryptids',
   projectName: 'jobsapp',
-  deploymentBranch: 'gh-pages',
 
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
