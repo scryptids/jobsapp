@@ -1,0 +1,7 @@
+table:
+  name: positions
+  schema: public
+object_relationships:
+  - name: employer
+    using:
+      foreign_key_constraint_on: employer_id

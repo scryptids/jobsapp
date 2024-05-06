@@ -1,0 +1,11 @@
+table:
+  name: employers
+  schema: public
+array_relationships:
+  - name: positions
+    using:
+      foreign_key_constraint_on:
+        column: employer_id
+        table:
+          name: positions
+          schema: public

@@ -1,1 +1,2 @@
-[]
+- "!include public_employers.yaml"
+- "!include public_positions.yaml"
