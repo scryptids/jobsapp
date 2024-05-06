@@ -1,0 +1,9 @@
+query positions($limit: Int! = 10) {
+  positions(limit: $limit) {
+    id
+    title
+    employer {
+      name
+    }
+  }
+}

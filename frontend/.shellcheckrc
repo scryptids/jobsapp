@@ -1,0 +1,2 @@
+disable=SC2148 # shebang warning
+disable=SC2034 # unused variables

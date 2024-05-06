@@ -11,6 +11,8 @@ services:
     ports:
       - "8080:8080"
     restart: always
+    env_file:
+      - ./frontend/.env
     environment:
       ## postgres database to store Hasura metadata
       HASURA_GRAPHQL_METADATA_DATABASE_URL: postgres://postgres:postgrespassword@postgres:5432/postgres

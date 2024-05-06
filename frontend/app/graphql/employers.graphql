@@ -1,0 +1,6 @@
+query employers($limit: Int! = 10) {
+  employers(limit: $limit) {
+    id
+    name
+  }
+}
