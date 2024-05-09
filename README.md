@@ -41,8 +41,8 @@ hasura metadata reload;
 docker compose up -d
 
 # Apply Hasura metadata, run migrations, then seed database
-source frontend/.env
-cd api
+set -a; source frontend/.env; set +a;
+cd api;
 hasura metadata apply;
 hasura migrate apply --database-name default;
 hasura seed apply --database-name default;

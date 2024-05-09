@@ -7,7 +7,7 @@ const config: CodegenConfig = {
     {
       [endpoint]: {
         headers: {
-          'x-hasura-admin-secret': process.env.GRAPHQL_ADMIN_SECRET!,
+          'x-hasura-admin-secret': process.env.HASURA_GRAPHQL_ADMIN_SECRET!,
         }
       },
     },
