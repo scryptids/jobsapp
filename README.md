@@ -14,7 +14,7 @@
 
 ### Create .env file
 
-Copy `./frontend/.env.example` to `./frontend/.env` and update the value for `HASURA_GRAPHQL_ADMIN_SECRET`. Hasura only reads this value once when it initializes - if you add or change this value after starting the container then you'll need to delete the volume and repeat the local development setup procedure.
+Copy `./www/.env.example` to `./www/.env` and update the value for `HASURA_GRAPHQL_ADMIN_SECRET`. Hasura only reads this value once when it initializes - if you add or change this value after starting the container then you'll need to delete the volume and repeat the local development setup procedure.
 
 ### Create/run containers and initialize Hasura
 
@@ -41,7 +41,7 @@ hasura metadata reload;
 docker compose up -d
 
 # Apply Hasura metadata, run migrations, then seed database
-set -a; source frontend/.env; set +a;
+set -a; source www/.env; set +a;
 cd hasura;
 hasura metadata apply;
 hasura migrate apply --database-name default;
