@@ -1,4 +1,5 @@
 services:
+
   postgres:
     image: postgres:15
     restart: always
@@ -6,13 +7,14 @@ services:
       - db_data:/var/lib/postgresql/data
     environment:
       POSTGRES_PASSWORD: postgrespassword
+
   graphql-engine:
     image: hasura/graphql-engine:v2.38.0
     ports:
       - "8080:8080"
     restart: always
     env_file:
-      - ./frontend/.env
+      - ./www/.env
     environment:
       ## postgres database to store Hasura metadata
       HASURA_GRAPHQL_METADATA_DATABASE_URL: postgres://postgres:postgrespassword@postgres:5432/postgres
@@ -31,6 +33,7 @@ services:
     depends_on:
       data-connector-agent:
         condition: service_healthy
+
   data-connector-agent:
     image: hasura/graphql-data-connector:v2.38.0
     restart: always
