@@ -25,7 +25,7 @@ docker compose up -d
 
 # Apply Hasura metadata, run migrations, then seed database
 $Env:HASURA_GRAPHQL_ADMIN_SECRET = <value from .env file>
-cd api
+cd hasura
 hasura metadata apply;
 hasura migrate apply --database-name default;
 hasura seed apply --database-name default;
@@ -42,7 +42,7 @@ docker compose up -d
 
 # Apply Hasura metadata, run migrations, then seed database
 set -a; source frontend/.env; set +a;
-cd api;
+cd hasura;
 hasura metadata apply;
 hasura migrate apply --database-name default;
 hasura seed apply --database-name default;
