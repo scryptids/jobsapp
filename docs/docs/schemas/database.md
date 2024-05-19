@@ -6,9 +6,13 @@ sidebar_position: 1
 
 ```mermaid
 erDiagram
+    users {
+        integer id PK
+    }
     employers {
         integer id PK
         varchar(100) name
+        integer user_id FK
     }
     positions {
         integer id PK
@@ -17,18 +21,10 @@ erDiagram
         numeric pay_range_lower
         numeric pay_range_upper
         integer employer_id FK
-    }
-    position_tags {
-        integer tag_id PK
-        varchar(100) name
-    }
-    position_tag_relationships {
-        integer id PK
-        integer position_id
-        integer tag_id
+        integer user_id FK
     }
 
     employers                  || -- o{ positions     : opens
-    position_tag_relationships }o -- || positions     : labels
-    position_tag_relationships }o -- || position_tags : labels
+    users                      || -- o{ employers     : enters
+    users                      || -- o{ positions     : tracks
 ```
