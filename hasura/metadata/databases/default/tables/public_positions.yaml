@@ -5,3 +5,55 @@ object_relationships:
   - name: employer
     using:
       foreign_key_constraint_on: employer_id
+insert_permissions:
+  - role: user
+    permission:
+      check:
+        user_id:
+          _eq: X-Hasura-User-Id
+      columns:
+        - employer_id
+        - id
+        - pay_range_lower
+        - pay_range_upper
+        - posting_url
+        - title
+    comment: ""
+select_permissions:
+  - role: user
+    permission:
+      columns:
+        - employer_id
+        - id
+        - pay_range_lower
+        - pay_range_upper
+        - posting_url
+        - title
+      filter:
+        user_id:
+          _eq: X-Hasura-User-Id
+    comment: ""
+update_permissions:
+  - role: user
+    permission:
+      columns:
+        - employer_id
+        - id
+        - pay_range_lower
+        - pay_range_upper
+        - posting_url
+        - title
+      filter:
+        user_id:
+          _eq: X-Hasura-User-Id
+      check:
+        user_id:
+          _eq: X-Hasura-User-Id
+    comment: ""
+delete_permissions:
+  - role: user
+    permission:
+      filter:
+        user_id:
+          _eq: X-Hasura-User-Id
+    comment: ""

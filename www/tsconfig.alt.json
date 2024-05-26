@@ -1,0 +1,12 @@
+{
+  "extends": "./tsconfig.base.json",
+  "exclude": [
+    "codegen.ts",
+    "vite.config.ts"
+  ],
+  "compilerOptions": {
+    "noEmit": false,
+    "outDir": "build-alt",
+    "sourceMap": true,
+  },
+}

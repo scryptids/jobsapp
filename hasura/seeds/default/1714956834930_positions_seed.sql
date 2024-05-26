@@ -5,4 +5,6 @@ INSERT INTO public.positions (id, title, posting_url, pay_range_upper, pay_range
 INSERT INTO public.positions (id, title, posting_url, pay_range_upper, pay_range_lower, employer_id, user_id) VALUES (4, 'Code Monkey', NULL, 30000.00, 40000.00, 1, 1);
 INSERT INTO public.positions (id, title, posting_url, pay_range_upper, pay_range_lower, employer_id, user_id) VALUES (5, 'Vice President of Global Manipulation', NULL, 400000.00, 500000.00, 1, 1);
 INSERT INTO public.positions (id, title, posting_url, pay_range_upper, pay_range_lower, employer_id, user_id) VALUES (6, 'Director of Corporate Espionage', NULL, NULL, NULL, 1, 1);
+INSERT INTO public.positions (id, title, posting_url, pay_range_upper, pay_range_lower, employer_id, user_id) VALUES (7, 'Actuary', NULL, NULL, NULL, 4, 2);
+INSERT INTO public.positions (id, title, posting_url, pay_range_upper, pay_range_lower, employer_id, user_id) VALUES (8, 'Software Development Engineer in Test', NULL, NULL, NULL, 4, 2);
 SELECT pg_catalog.setval('public.positions_id_seq', 6, true);

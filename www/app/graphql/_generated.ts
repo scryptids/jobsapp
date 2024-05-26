@@ -1366,6 +1366,7 @@ export type Users_Variance_Fields = {
 
 export type EmployersQueryVariables = Exact<{
   limit?: Scalars['Int']['input'];
+  user_id: Scalars['Int']['input'];
 }>;
 
 
@@ -1380,8 +1381,8 @@ export type PositionsQuery = { __typename?: 'query_root', positions: Array<{ __t
 
 
 export const EmployersDocument = gql`
-    query employers($limit: Int! = 10) {
-  employers(limit: $limit) {
+    query employers($limit: Int! = 10, $user_id: Int!) {
+  employers(where: {user_id: {_eq: $user_id}}, limit: $limit) {
     id
     name
   }
@@ -1406,7 +1407,7 @@ const defaultWrapper: SdkFunctionWrapper = (action, _operationName, _operationTy
 
 export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = defaultWrapper) {
   return {
-    employers(variables?: EmployersQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<EmployersQuery> {
+    employers(variables: EmployersQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<EmployersQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<EmployersQuery>(EmployersDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'employers', 'query', variables);
     },
     positions(variables?: PositionsQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<PositionsQuery> {

@@ -2,16 +2,45 @@
 // All packages except `@mantine/hooks` require styles imports
 import '@mantine/core/styles.css';
 
+import { json, LoaderFunctionArgs } from '@remix-run/node';
 import {
+  redirect,
   Links,
   Meta,
   Outlet,
   Scripts,
   ScrollRestoration,
+  useLoaderData,
 } from "@remix-run/react";
 import { ColorSchemeScript, MantineProvider, AppShell } from '@mantine/core';
 
+import { sessionStorage } from '~/sessions';
+import { Header } from '~/components/Header/Header';
+
+export async function loader({ request }: LoaderFunctionArgs) {
+  const session = await sessionStorage.getSession(
+    request.headers.get("Cookie"),
+  );
+
+  if (session.has("userId") && new URL(request.url).pathname === "/") {
+    // Redirect to the home page if they are already signed in
+    throw redirect("/home");
+  }
+
+  const data = {
+    userId: session.get("userId") || null,
+  }
+
+  return json(data, {
+    headers: {
+      "Set-Cookie": await sessionStorage.commitSession(session),
+    }
+  })
+}
+
 export function Layout({ children }: { children: React.ReactNode }) {
+  let data = useLoaderData<typeof loader>();
+
   return (
     <html lang="en">
       <head>
@@ -33,6 +62,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
             padding="md"
           >
             <AppShell.Header>
+              <Header userId={data.userId}/>
             </AppShell.Header>
             <AppShell.Main>{children}</AppShell.Main>
           </AppShell>
