@@ -2,19 +2,19 @@
 sidebar_position: 1
 ---
 
-# Database
+# Entity Relationships
 
 ```mermaid
 erDiagram
-    users {
+    user {
         integer id PK
     }
-    employers {
+    employer {
         integer id PK
         varchar(100) name
         integer user_id FK
     }
-    positions {
+    position {
         integer id PK
         varchar(100) title
         varchar(500) posting_url
@@ -24,7 +24,7 @@ erDiagram
         integer user_id FK
     }
 
-    employers                  || -- o{ positions     : opens
-    users                      || -- o{ employers     : enters
-    users                      || -- o{ positions     : tracks
+    employer                  || -- o{ position     : opens
+    user                      || -- o{ employer     : enters
+    user                      || -- o{ position     : tracks
 ```
