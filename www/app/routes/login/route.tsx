@@ -13,9 +13,16 @@ import {
 import { Button, TextInput, Container } from "@mantine/core";
 
 import { sessionStorage } from "~/sessions";
-import { validate } from "./validate";
-import { login } from "./queries";
 import { generateHasuraJWT } from "~/auth/hasura";
+import { validateLoginCreds } from "~/auth/validation";
+
+export async function login(email: string, password: string) {
+  await new Promise((resolve) => resolve(null))
+  if (false) {
+    return false
+  }
+  return 1
+}
 
 export const meta = () => {
   return [{ title: "Login" }];
@@ -46,7 +53,7 @@ export async function action({ request }: ActionFunctionArgs) {
   const email = String(formData.get("email") || "");
   const password = String(formData.get("password") || "");
 
-  const errors = validate(email, password);
+  const errors = validateLoginCreds(email, password);
   if (errors) {
     return json({ ok: false, errors }, 400);
   }

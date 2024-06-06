@@ -3,9 +3,13 @@ import { Form, Link, useActionData, useLoaderData } from "@remix-run/react";
 import { Button, TextInput, Container } from "@mantine/core";
 
 import { sessionStorage } from "~/sessions";
-import { validate } from "./validate";
-import { createAccount } from "./queries";
 import { generateHasuraJWT } from "~/auth/hasura";
+import { validateSignupCreds } from "~/auth/validation";
+
+export async function createAccount(email: string, password: string) {
+  await new Promise((resolve) => resolve(null))
+  return { id: 1 } // TODO
+}
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const session = await sessionStorage.getSession(
@@ -31,7 +35,7 @@ export async function action({ request }: ActionFunctionArgs) {
   const email = String(formData.get("email") || "");
   const password = String(formData.get("password") || "");
 
-  const errors = await validate(email, password);
+  const errors = await validateSignupCreds(email, password);
   if (errors) {
     return json({ ok: false, errors }, 400);
   }
