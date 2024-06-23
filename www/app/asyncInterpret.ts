@@ -32,23 +32,28 @@ function pausedOrDonePredicate(emitted: SnapshotFrom<AnyActorRef>): boolean {
   return false
 }
 
-export async function asyncInterpret(
-  logic: AnyActorLogic,
-  timeoutMs: number,
+const DEFAULT_TIMEOUT = 2_000
+
+export interface AsyncInterpretOptions {
+  timeoutMs?: number
+  input?: Record<any, any>,
   initialState?: Snapshot<any>,
   initialEvent?: EventFromLogic<AnyActorLogic>,
-) {
+}
+
+export async function asyncInterpret(logic: AnyActorLogic, options?: AsyncInterpretOptions) {
   const actor = createActor(logic, {
-    snapshot: initialState
+    snapshot: options?.initialState,
+    input: options?.input,
   });
   actor.start();
-  if (initialEvent) {
-    actor.send(initialEvent);
+  if (options?.initialEvent) {
+    actor.send(options?.initialEvent);
   }
   return await waitFor(
     actor,
     pausedOrDonePredicate,
-    { timeout: timeoutMs }
+    { timeout: options?.timeoutMs ?? DEFAULT_TIMEOUT }
   );
 }
 
@@ -77,7 +82,7 @@ if (import.meta.vitest) {
     })
 
     it('interprets a machine with an always transition', async () => {
-      const state = await asyncInterpret(simpleAlwaysMachine, 100)
+      const state = await asyncInterpret(simpleAlwaysMachine, { timeoutMs: 100 })
       expect(state.status).toBe('done')
       expect(state.value).toBe('final_state')
       expect(state.output.message).toBe('elementary_watson')
@@ -110,7 +115,7 @@ if (import.meta.vitest) {
     })
 
     it('times-out a halted machine', async () => {
-      await expect(asyncInterpret(simpleHaltingMachine, 100)).rejects.toThrow('Timeout of 100 ms exceeded')
+      await expect(asyncInterpret(simpleHaltingMachine, { timeoutMs: 100 })).rejects.toThrow('Timeout of 100 ms exceeded')
     })
   }
 
@@ -126,7 +131,8 @@ if (import.meta.vitest) {
     const callbackActorLoginMachine = setup({
       types: {
         context: {} as { userId?: string, attempts: number },
-        events: {} as LoginMachineEvent
+        events: {} as LoginMachineEvent,
+        input: {} as { attempts?: number },
       },
       actors: {
         loginLogic: fromCallback<LoginMachineEvent>(({ sendBack, receive }) => {
@@ -152,7 +158,10 @@ if (import.meta.vitest) {
       },
     }).createMachine({
       id: 'simple_login',
-      context: { userId: undefined, attempts: 0 },
+      context: ({ input }) => ({
+        userId: undefined,
+        attempts: input?.attempts ?? 0
+      }),
       initial: 'login',
       states: {
         login: {
@@ -196,10 +205,13 @@ if (import.meta.vitest) {
     })
 
     it('callback-based login machine processes an action', async () => {
-      const state = await asyncInterpret(callbackActorLoginMachine, 100, undefined, {
-        type: 'creds.submit',
-        username: 'admin',
-        password: 'password',
+      const state = await asyncInterpret(callbackActorLoginMachine, {
+        timeoutMs: 100,
+        initialEvent: {
+          type: 'creds.submit',
+          username: 'admin',
+          password: 'password',
+        },
       })
       expect(state.status).toBe('done')
       expect(state.value).toBe('success')
@@ -208,34 +220,63 @@ if (import.meta.vitest) {
     })
 
     it('callback-based login machine limits max attempts', async () => {
-      let state = await asyncInterpret(callbackActorLoginMachine, 100, undefined, {
-        type: 'creds.submit',
-        username: 'admin',
-        password: 'admin',
+      let state = await asyncInterpret(callbackActorLoginMachine, {
+        timeoutMs: 100,
+        initialEvent: {
+          type: 'creds.submit',
+          username: 'admin',
+          password: 'admin',
+        },
       })
       expect(state.value).toBe('login')
       expect(state.context).toStrictEqual({ userId: undefined, attempts: 1 })
-      state = await asyncInterpret(callbackActorLoginMachine, 100, state, {
-        type: 'creds.submit',
-        username: 'admin',
-        password: '123456',
+      state = await asyncInterpret(callbackActorLoginMachine, {
+        timeoutMs: 100,
+        initialState: state,
+        initialEvent: {
+          type: 'creds.submit',
+          username: 'admin',
+          password: '123456',
+        },
       })
       expect(state.value).toBe('login')
       expect(state.context).toStrictEqual({ userId: undefined, attempts: 2 })
-      state = await asyncInterpret(callbackActorLoginMachine, 100, state, {
-        type: 'creds.submit',
-        username: 'admin',
-        password: 'baseball',
+      state = await asyncInterpret(callbackActorLoginMachine, {
+        timeoutMs: 100,
+        initialState: state,
+        initialEvent: {
+          type: 'creds.submit',
+          username: 'admin',
+          password: 'baseball',
+        },
       })
       expect(state.value).toBe('login')
       expect(state.context).toStrictEqual({ userId: undefined, attempts: 3 })
-      state = await asyncInterpret(callbackActorLoginMachine, 100, state, {
-        type: 'creds.submit',
-        username: 'admin',
-        password: 'football',
+      state = await asyncInterpret(callbackActorLoginMachine, {
+        timeoutMs: 100,
+        initialState: state,
+        initialEvent: {
+          type: 'creds.submit',
+          username: 'admin',
+          password: 'football',
+        },
       })
       expect(state.value).toBe('failure')
       expect(state.context).toStrictEqual({ userId: undefined, attempts: 4 })
+    })
+
+    it('callback-based login machine initializes context using input', async () => {
+      const state = await asyncInterpret(callbackActorLoginMachine, {
+        timeoutMs: 100,
+        initialEvent: {
+          type: 'creds.submit',
+          username: 'admin',
+          password: 'password',
+        },
+        input: { attempts: 3, },
+      });
+      expect(state.status).toBe('done')
+      expect(state.value).toBe('failure')
     })
   }
 }
