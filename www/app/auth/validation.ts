@@ -1,3 +1,9 @@
+/**
+ * This file contains functions for validating user input during the signup and login processes.
+ * 
+ * @module
+ */
+
 export async function accountExists(email: string): Promise<boolean> {
   await new Promise((resolve) => resolve(null))
   return false

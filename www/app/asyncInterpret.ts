@@ -8,6 +8,7 @@
  * @module
  */
 
+import { Session } from "@remix-run/node";
 import {
   EventFromLogic,
   Snapshot,
@@ -15,6 +16,7 @@ import {
   createActor,
   setup,
   fromCallback,
+  fromPromise,
   waitFor,
   assign,
   sendTo,
@@ -277,6 +279,60 @@ if (import.meta.vitest) {
       });
       expect(state.status).toBe('done')
       expect(state.value).toBe('failure')
+    })
+  }
+
+  {
+    // test having a child actor mutate an external object
+
+    type MockSession = {
+      userId: number,
+    }
+
+    const autologinMachine = setup({
+      types: {
+        context: {} as { session: MockSession },
+        input: {} as { session: MockSession },
+      },
+      actors: {
+        initSession: fromPromise(async ({ input }) => {
+          // @ts-ignore
+          input.session.userId = 1
+        })
+      },
+    }).createMachine({
+      id: 'auto_login_machine',
+      context: ({ input }) => ({
+        session: input.session,
+      }),
+      initial: 'start',
+      states: {
+        start: {
+          invoke: {
+            id: 'session_init_actor',
+            src: 'initSession',
+            input: ({ context: { session } }) => ({ session }),
+            onDone: {
+              target: '/home',
+            },
+          },
+        },
+        "/home": {
+          type: 'final',
+        },
+      },
+    })
+
+    it('state machine with promise child actor mutates external object', async () => {
+      const session: Partial<MockSession> = {
+        userId: undefined,
+      }
+      const state = await asyncInterpret(autologinMachine, {
+        timeoutMs: 100,
+        input: { session: session },
+      })
+      expect(session.userId).toBe(1)
+      expect(state.status).toBe('done')
     })
   }
 }

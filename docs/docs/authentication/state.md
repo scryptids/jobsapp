@@ -2,7 +2,23 @@
 sidebar_position: 1
 ---
 
-# State machine (prospective)
+# State
+
+## Automatic login machine (currently implemented)
+
+To be able to test Hasura authorization without needing to repeatedly enter credentials, there is a state machine that automatically logs the developer in as userId: 1 when they navigate to `/login`. A mechanism like dependency injection could be added in later to make it easier to swap out different authentication implementations
+
+```mermaid
+stateDiagram-v2
+    state "Logged out" as logged_out
+    state "Logged in" as logged_in
+
+    logged_out --> logged_in : Navigate to /login
+    logged_in --> logged_out : Navigate to /logout
+```
+
+## MFA state machine (prospective)
+
 
 ```mermaid
 stateDiagram-v2

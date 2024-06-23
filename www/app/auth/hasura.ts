@@ -1,3 +1,8 @@
+/**
+ * JWT generation for Hasura
+ * @module
+ */
+
 import * as jose from "jose";
 
 const alg = "HS256"

@@ -1,5 +1,10 @@
-// Import styles of packages that you've installed.
-// All packages except `@mantine/hooks` require styles imports
+/**
+ * Remix root route for rendering the app shell and header.
+ * The root loader runs on the root path and all child routes.
+ * 
+ * @module
+ */
+
 import '@mantine/core/styles.css';
 
 import { json, LoaderFunctionArgs } from '@remix-run/node';
@@ -33,7 +38,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
   return json(data, {
     headers: {
-      "Set-Cookie": await sessionStorage.commitSession(session),
+      // "Set-Cookie": await sessionStorage.commitSession(session),
     }
   })
 }

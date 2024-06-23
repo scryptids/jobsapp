@@ -1,5 +1,6 @@
 import { LoaderFunctionArgs, json } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
+import { PositionsQuery } from "~/graphql/_generated";
 
 import {
   requireAuthSession,
@@ -11,11 +12,16 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const session = await requireAuthSession(request);
 
   const variables = { limit: 10 }
-  const hasuraAccessToken = await getSessionHasuraToken(session);
-  const positions = await sdk.positions(variables, {
-    authorization: `Bearer ${hasuraAccessToken}`,
-  });
-  return json(positions);
+  const hasuraAccessToken = getSessionHasuraToken(session);
+  try {
+    const positions = await sdk.positions(variables, {
+      authorization: `Bearer ${hasuraAccessToken}`,
+    });
+    return json(positions);
+  } catch (e) {
+    const emptyResp: Pick<PositionsQuery, 'positions'> = { positions: [] }
+    return json(emptyResp)
+  }
 };
 
 export default function Posts() {

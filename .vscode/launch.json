@@ -1,19 +1,36 @@
 {
-    // Use IntelliSense to learn about possible attributes.
-    // Hover to view descriptions of existing attributes.
-    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
-    "version": "0.2.0",
-    "configurations": [
-        {
-            "type": "node",
-            "request": "launch",
-            "name": "Codegen compile",
-            "skipFiles": [
-                "<node_internals>/**"
-            ],
-            "cwd": "${workspaceFolder}/www",
-            "program": "node_modules/.bin/gql-gen",
-            "envFile": "${workspaceFolder}/www/.env"
-        }
-    ]
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Compile and launch gen-hasura-jwt script",
+      "program": "${workspaceFolder}/www/build-alt/tools/gen-hasura-jwt.js",
+      "preLaunchTask": "tsc: build - www/tsconfig.alt.json"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Codegen compile",
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
+      "cwd": "${workspaceFolder}/www",
+      "program": "node_modules/.bin/gql-gen",
+      "envFile": "${workspaceFolder}/www/.env"
+    },
+    {
+      "type": "node",
+      "request": "attach",
+      "name": "Attach to Node.js process",
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
+      "cwd": "${workspaceFolder}/www",
+      "processId": "${command:PickProcess}"
+    }
+  ]
 }

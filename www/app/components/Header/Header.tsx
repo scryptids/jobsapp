@@ -1,3 +1,8 @@
+/**
+ * Site header nav
+ * @module
+ */
+
 import { Link } from "@remix-run/react";
 import classes from "./Header.module.css";
 
