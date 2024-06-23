@@ -32,31 +32,31 @@ const config: Config = {
   },
 
   plugins: [
-    [
-      'docusaurus-plugin-typedoc',
-      {
-        tsconfig: '../www/tsconfig.json',
-        entryPoints: [
-          '../www/app/auth/**/*.{js,jsx,ts,tsx}',
-          '../www/app/components/**/*.{js,jsx,ts,tsx}',
-          '../www/app/routes/**/*.{js,jsx,ts,tsx}',
-          '../www/app/utils/**/*.{js,jsx,ts,tsx}',
-          '../www/app/cookies.ts',
-          '../www/app/root.tsx',
-        ],
-        out: './docs/app',
-        entryFileName: 'index.md',
-        sidebar: { pretty: true },
-        textContentMappings: {
-          'title.indexPage': 'Remix app source',
-          'title.memberPage': '{name}',
-        },
-        indexFormat: 'table',
-        parametersFormat: 'table',
-        enumMembersFormat: 'table',
-        watch: true,
-      },
-    ],
+    // [
+    //   'docusaurus-plugin-typedoc',
+    //   {
+    //     tsconfig: '../www/tsconfig.json',
+    //     entryPoints: [
+    //       '../www/app/auth/**/*.{js,jsx,ts,tsx}',
+    //       '../www/app/components/**/*.{js,jsx,ts,tsx}',
+    //       '../www/app/routes/**/*.{js,jsx,ts,tsx}',
+    //       '../www/app/utils/**/*.{js,jsx,ts,tsx}',
+    //       '../www/app/cookies.ts',
+    //       '../www/app/root.tsx',
+    //     ],
+    //     out: './docs/app',
+    //     entryFileName: 'index.md',
+    //     sidebar: { pretty: true },
+    //     textContentMappings: {
+    //       'title.indexPage': 'Remix app source',
+    //       'title.memberPage': '{name}',
+    //     },
+    //     indexFormat: 'table',
+    //     parametersFormat: 'table',
+    //     enumMembersFormat: 'table',
+    //     watch: true,
+    //   },
+    // ],
   ],
 
   presets: [
