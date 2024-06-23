@@ -31,23 +31,42 @@ const config: Config = {
     locales: ['en'],
   },
 
+  plugins: [
+    [
+      'docusaurus-plugin-typedoc',
+      {
+        tsconfig: '../www/tsconfig.json',
+        entryPoints: [
+          '../www/app/auth/**/*.{js,jsx,ts,tsx}',
+          '../www/app/components/**/*.{js,jsx,ts,tsx}',
+          '../www/app/routes/**/*.{js,jsx,ts,tsx}',
+          '../www/app/utils/**/*.{js,jsx,ts,tsx}',
+          '../www/app/cookies.ts',
+          '../www/app/root.tsx',
+        ],
+        out: './docs/app',
+        entryFileName: 'index.md',
+        sidebar: { pretty: true },
+        textContentMappings: {
+          'title.indexPage': 'Remix app source',
+          'title.memberPage': '{name}',
+        },
+        indexFormat: 'table',
+        parametersFormat: 'table',
+        enumMembersFormat: 'table',
+        watch: true,
+      },
+    ],
+  ],
+
   presets: [
     [
       'classic',
       {
         docs: {
           sidebarPath: './sidebars.ts',
-          // Please change this to your repo.
-          // Remove this to remove the "edit this page" links.
           editUrl:
-            'https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/',
-        },
-        blog: {
-          showReadingTime: true,
-          // Please change this to your repo.
-          // Remove this to remove the "edit this page" links.
-          editUrl:
-            'https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/',
+            'https://github.com/scryptids/jobsapp/tree/main/docs',
         },
         theme: {
           customCss: './src/css/custom.css',
@@ -68,13 +87,12 @@ const config: Config = {
       items: [
         {
           type: 'docSidebar',
-          sidebarId: 'tutorialSidebar',
+          sidebarId: 'docsSidebar',
           position: 'left',
-          label: 'Tutorial',
+          label: 'Docs',
         },
-        {to: '/blog', label: 'Blog', position: 'left'},
         {
-          href: 'https://github.com/facebook/docusaurus',
+          href: 'https://github.com/scryptids/jobsapp',
           label: 'GitHub',
           position: 'right',
         },
@@ -87,25 +105,8 @@ const config: Config = {
           title: 'Docs',
           items: [
             {
-              label: 'Tutorial',
+              label: 'Docs',
               to: '/docs/intro',
-            },
-          ],
-        },
-        {
-          title: 'Community',
-          items: [
-            {
-              label: 'Stack Overflow',
-              href: 'https://stackoverflow.com/questions/tagged/docusaurus',
-            },
-            {
-              label: 'Discord',
-              href: 'https://discordapp.com/invite/docusaurus',
-            },
-            {
-              label: 'Twitter',
-              href: 'https://twitter.com/docusaurus',
             },
           ],
         },
@@ -113,12 +114,8 @@ const config: Config = {
           title: 'More',
           items: [
             {
-              label: 'Blog',
-              to: '/blog',
-            },
-            {
               label: 'GitHub',
-              href: 'https://github.com/facebook/docusaurus',
+              href: 'https://github.com/scryptids/jobsapp',
             },
           ],
         },

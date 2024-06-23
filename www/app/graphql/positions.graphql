@@ -1,5 +1,7 @@
 query positions($limit: Int! = 10) {
-  positions(limit: $limit) {
+  positions(
+    limit: $limit
+  ) {
     id
     title
     employer {

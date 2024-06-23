@@ -9,6 +9,7 @@ services:
       POSTGRES_PASSWORD: postgrespassword
 
   graphql-engine:
+    container_name: jobsapp-graphql-engine
     image: hasura/graphql-engine:v2.38.0
     ports:
       - "8080:8080"
@@ -27,8 +28,6 @@ services:
       HASURA_GRAPHQL_ENABLED_LOG_TYPES: startup, http-log, webhook-log, websocket-log, query-log
       ## uncomment next line to run console offline (i.e load console assets from server instead of CDN)
       # HASURA_GRAPHQL_CONSOLE_ASSETS_DIR: /srv/console-assets
-      ## uncomment next line to set an admin secret
-      # HASURA_GRAPHQL_ADMIN_SECRET: myadminsecretkey
       HASURA_GRAPHQL_METADATA_DEFAULTS: '{"backend_configs":{"dataconnector":{"athena":{"uri":"http://data-connector-agent:8081/api/v1/athena"},"mariadb":{"uri":"http://data-connector-agent:8081/api/v1/mariadb"},"mysql8":{"uri":"http://data-connector-agent:8081/api/v1/mysql"},"oracle":{"uri":"http://data-connector-agent:8081/api/v1/oracle"},"snowflake":{"uri":"http://data-connector-agent:8081/api/v1/snowflake"}}}}'
     depends_on:
       data-connector-agent:
@@ -50,5 +49,25 @@ services:
       timeout: 10s
       retries: 5
       start_period: 5s
+
+  # www:
+  #   build: ./www
+  #   restart: always
+  #   ports:
+  #     - 5173:5173
+  #   command: npm start
+  #   environment:
+  #     NODE_ENV: development
+  #     GRAPHQL_ENDPOINT: http://graphql-engine/v1/graphql
+  #   develop:
+  #     watch:
+  #       - action: sync
+  #         path: ./www/web
+  #         target: /src/web
+  #         ignore:
+  #           - node_modules
+  #       - action: rebuild
+  #         path: ./www/package.json
+
 volumes:
   db_data:

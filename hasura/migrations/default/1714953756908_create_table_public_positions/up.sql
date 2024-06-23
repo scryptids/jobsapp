@@ -4,5 +4,6 @@ CREATE TABLE "public"."positions" (
     posting_url VARCHAR(255),
     pay_range_upper NUMERIC(10, 2),
     pay_range_lower NUMERIC(10, 2),
-    employer_id INTEGER REFERENCES "public"."employers" ("id") ON UPDATE RESTRICT ON DELETE RESTRICT
+    employer_id INTEGER REFERENCES "public"."employers" ("id") ON UPDATE RESTRICT ON DELETE RESTRICT,
+    user_id INTEGER REFERENCES "public"."users" ("id") ON UPDATE RESTRICT ON DELETE RESTRICT
 );

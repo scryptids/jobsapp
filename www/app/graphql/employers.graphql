@@ -1,5 +1,8 @@
-query employers($limit: Int! = 10) {
-  employers(limit: $limit) {
+query employers($limit: Int! = 10, $user_id: Int!) {
+  employers(
+    where: {user_id: {_eq: $user_id}},
+    limit: $limit
+  ) {
     id
     name
   }

@@ -81,6 +81,7 @@ export type Employers = {
   positions: Array<Positions>;
   /** An aggregate relationship */
   positions_aggregate: Positions_Aggregate;
+  user_id?: Maybe<Scalars['Int']['output']>;
 };
 
 
@@ -137,6 +138,7 @@ export type Employers_Aggregate_FieldsCountArgs = {
 export type Employers_Avg_Fields = {
   __typename?: 'employers_avg_fields';
   id?: Maybe<Scalars['Float']['output']>;
+  user_id?: Maybe<Scalars['Float']['output']>;
 };
 
 /** Boolean expression to filter rows from the table "employers". All fields are combined with a logical 'AND'. */
@@ -148,6 +150,7 @@ export type Employers_Bool_Exp = {
   name?: InputMaybe<String_Comparison_Exp>;
   positions?: InputMaybe<Positions_Bool_Exp>;
   positions_aggregate?: InputMaybe<Positions_Aggregate_Bool_Exp>;
+  user_id?: InputMaybe<Int_Comparison_Exp>;
 };
 
 /** unique or primary key constraints on table "employers" */
@@ -159,6 +162,7 @@ export enum Employers_Constraint {
 /** input type for incrementing numeric columns in table "employers" */
 export type Employers_Inc_Input = {
   id?: InputMaybe<Scalars['Int']['input']>;
+  user_id?: InputMaybe<Scalars['Int']['input']>;
 };
 
 /** input type for inserting data into table "employers" */
@@ -166,6 +170,7 @@ export type Employers_Insert_Input = {
   id?: InputMaybe<Scalars['Int']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
   positions?: InputMaybe<Positions_Arr_Rel_Insert_Input>;
+  user_id?: InputMaybe<Scalars['Int']['input']>;
 };
 
 /** aggregate max on columns */
@@ -173,6 +178,7 @@ export type Employers_Max_Fields = {
   __typename?: 'employers_max_fields';
   id?: Maybe<Scalars['Int']['output']>;
   name?: Maybe<Scalars['String']['output']>;
+  user_id?: Maybe<Scalars['Int']['output']>;
 };
 
 /** aggregate min on columns */
@@ -180,6 +186,7 @@ export type Employers_Min_Fields = {
   __typename?: 'employers_min_fields';
   id?: Maybe<Scalars['Int']['output']>;
   name?: Maybe<Scalars['String']['output']>;
+  user_id?: Maybe<Scalars['Int']['output']>;
 };
 
 /** response of any mutation on the table "employers" */
@@ -210,6 +217,7 @@ export type Employers_Order_By = {
   id?: InputMaybe<Order_By>;
   name?: InputMaybe<Order_By>;
   positions_aggregate?: InputMaybe<Positions_Aggregate_Order_By>;
+  user_id?: InputMaybe<Order_By>;
 };
 
 /** primary key columns input for table: employers */
@@ -222,31 +230,37 @@ export enum Employers_Select_Column {
   /** column name */
   Id = 'id',
   /** column name */
-  Name = 'name'
+  Name = 'name',
+  /** column name */
+  UserId = 'user_id'
 }
 
 /** input type for updating data in table "employers" */
 export type Employers_Set_Input = {
   id?: InputMaybe<Scalars['Int']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
+  user_id?: InputMaybe<Scalars['Int']['input']>;
 };
 
 /** aggregate stddev on columns */
 export type Employers_Stddev_Fields = {
   __typename?: 'employers_stddev_fields';
   id?: Maybe<Scalars['Float']['output']>;
+  user_id?: Maybe<Scalars['Float']['output']>;
 };
 
 /** aggregate stddev_pop on columns */
 export type Employers_Stddev_Pop_Fields = {
   __typename?: 'employers_stddev_pop_fields';
   id?: Maybe<Scalars['Float']['output']>;
+  user_id?: Maybe<Scalars['Float']['output']>;
 };
 
 /** aggregate stddev_samp on columns */
 export type Employers_Stddev_Samp_Fields = {
   __typename?: 'employers_stddev_samp_fields';
   id?: Maybe<Scalars['Float']['output']>;
+  user_id?: Maybe<Scalars['Float']['output']>;
 };
 
 /** Streaming cursor of the table "employers" */
@@ -261,12 +275,14 @@ export type Employers_Stream_Cursor_Input = {
 export type Employers_Stream_Cursor_Value_Input = {
   id?: InputMaybe<Scalars['Int']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
+  user_id?: InputMaybe<Scalars['Int']['input']>;
 };
 
 /** aggregate sum on columns */
 export type Employers_Sum_Fields = {
   __typename?: 'employers_sum_fields';
   id?: Maybe<Scalars['Int']['output']>;
+  user_id?: Maybe<Scalars['Int']['output']>;
 };
 
 /** update columns of table "employers" */
@@ -274,7 +290,9 @@ export enum Employers_Update_Column {
   /** column name */
   Id = 'id',
   /** column name */
-  Name = 'name'
+  Name = 'name',
+  /** column name */
+  UserId = 'user_id'
 }
 
 export type Employers_Updates = {
@@ -290,18 +308,21 @@ export type Employers_Updates = {
 export type Employers_Var_Pop_Fields = {
   __typename?: 'employers_var_pop_fields';
   id?: Maybe<Scalars['Float']['output']>;
+  user_id?: Maybe<Scalars['Float']['output']>;
 };
 
 /** aggregate var_samp on columns */
 export type Employers_Var_Samp_Fields = {
   __typename?: 'employers_var_samp_fields';
   id?: Maybe<Scalars['Float']['output']>;
+  user_id?: Maybe<Scalars['Float']['output']>;
 };
 
 /** aggregate variance on columns */
 export type Employers_Variance_Fields = {
   __typename?: 'employers_variance_fields';
   id?: Maybe<Scalars['Float']['output']>;
+  user_id?: Maybe<Scalars['Float']['output']>;
 };
 
 /** mutation root */
@@ -315,6 +336,10 @@ export type Mutation_Root = {
   delete_positions?: Maybe<Positions_Mutation_Response>;
   /** delete single row from the table: "positions" */
   delete_positions_by_pk?: Maybe<Positions>;
+  /** delete data from the table: "users" */
+  delete_users?: Maybe<Users_Mutation_Response>;
+  /** delete single row from the table: "users" */
+  delete_users_by_pk?: Maybe<Users>;
   /** insert data into the table: "employers" */
   insert_employers?: Maybe<Employers_Mutation_Response>;
   /** insert a single row into the table: "employers" */
@@ -323,6 +348,10 @@ export type Mutation_Root = {
   insert_positions?: Maybe<Positions_Mutation_Response>;
   /** insert a single row into the table: "positions" */
   insert_positions_one?: Maybe<Positions>;
+  /** insert data into the table: "users" */
+  insert_users?: Maybe<Users_Mutation_Response>;
+  /** insert a single row into the table: "users" */
+  insert_users_one?: Maybe<Users>;
   /** update data of the table: "employers" */
   update_employers?: Maybe<Employers_Mutation_Response>;
   /** update single row of the table: "employers" */
@@ -335,6 +364,12 @@ export type Mutation_Root = {
   update_positions_by_pk?: Maybe<Positions>;
   /** update multiples rows of table: "positions" */
   update_positions_many?: Maybe<Array<Maybe<Positions_Mutation_Response>>>;
+  /** update data of the table: "users" */
+  update_users?: Maybe<Users_Mutation_Response>;
+  /** update single row of the table: "users" */
+  update_users_by_pk?: Maybe<Users>;
+  /** update multiples rows of table: "users" */
+  update_users_many?: Maybe<Array<Maybe<Users_Mutation_Response>>>;
 };
 
 
@@ -358,6 +393,18 @@ export type Mutation_RootDelete_PositionsArgs = {
 
 /** mutation root */
 export type Mutation_RootDelete_Positions_By_PkArgs = {
+  id: Scalars['Int']['input'];
+};
+
+
+/** mutation root */
+export type Mutation_RootDelete_UsersArgs = {
+  where: Users_Bool_Exp;
+};
+
+
+/** mutation root */
+export type Mutation_RootDelete_Users_By_PkArgs = {
   id: Scalars['Int']['input'];
 };
 
@@ -387,6 +434,20 @@ export type Mutation_RootInsert_PositionsArgs = {
 export type Mutation_RootInsert_Positions_OneArgs = {
   object: Positions_Insert_Input;
   on_conflict?: InputMaybe<Positions_On_Conflict>;
+};
+
+
+/** mutation root */
+export type Mutation_RootInsert_UsersArgs = {
+  objects: Array<Users_Insert_Input>;
+  on_conflict?: InputMaybe<Users_On_Conflict>;
+};
+
+
+/** mutation root */
+export type Mutation_RootInsert_Users_OneArgs = {
+  object: Users_Insert_Input;
+  on_conflict?: InputMaybe<Users_On_Conflict>;
 };
 
 
@@ -433,6 +494,28 @@ export type Mutation_RootUpdate_Positions_ManyArgs = {
   updates: Array<Positions_Updates>;
 };
 
+
+/** mutation root */
+export type Mutation_RootUpdate_UsersArgs = {
+  _inc?: InputMaybe<Users_Inc_Input>;
+  _set?: InputMaybe<Users_Set_Input>;
+  where: Users_Bool_Exp;
+};
+
+
+/** mutation root */
+export type Mutation_RootUpdate_Users_By_PkArgs = {
+  _inc?: InputMaybe<Users_Inc_Input>;
+  _set?: InputMaybe<Users_Set_Input>;
+  pk_columns: Users_Pk_Columns_Input;
+};
+
+
+/** mutation root */
+export type Mutation_RootUpdate_Users_ManyArgs = {
+  updates: Array<Users_Updates>;
+};
+
 /** Boolean expression to compare columns of type "numeric". All fields are combined with logical 'AND'. */
 export type Numeric_Comparison_Exp = {
   _eq?: InputMaybe<Scalars['numeric']['input']>;
@@ -473,6 +556,7 @@ export type Positions = {
   pay_range_upper?: Maybe<Scalars['numeric']['output']>;
   posting_url?: Maybe<Scalars['String']['output']>;
   title: Scalars['String']['output'];
+  user_id?: Maybe<Scalars['Int']['output']>;
 };
 
 /** aggregated selection of "positions" */
@@ -545,6 +629,7 @@ export type Positions_Avg_Fields = {
   id?: Maybe<Scalars['Float']['output']>;
   pay_range_lower?: Maybe<Scalars['Float']['output']>;
   pay_range_upper?: Maybe<Scalars['Float']['output']>;
+  user_id?: Maybe<Scalars['Float']['output']>;
 };
 
 /** order by avg() on columns of table "positions" */
@@ -553,6 +638,7 @@ export type Positions_Avg_Order_By = {
   id?: InputMaybe<Order_By>;
   pay_range_lower?: InputMaybe<Order_By>;
   pay_range_upper?: InputMaybe<Order_By>;
+  user_id?: InputMaybe<Order_By>;
 };
 
 /** Boolean expression to filter rows from the table "positions". All fields are combined with a logical 'AND'. */
@@ -567,6 +653,7 @@ export type Positions_Bool_Exp = {
   pay_range_upper?: InputMaybe<Numeric_Comparison_Exp>;
   posting_url?: InputMaybe<String_Comparison_Exp>;
   title?: InputMaybe<String_Comparison_Exp>;
+  user_id?: InputMaybe<Int_Comparison_Exp>;
 };
 
 /** unique or primary key constraints on table "positions" */
@@ -581,6 +668,7 @@ export type Positions_Inc_Input = {
   id?: InputMaybe<Scalars['Int']['input']>;
   pay_range_lower?: InputMaybe<Scalars['numeric']['input']>;
   pay_range_upper?: InputMaybe<Scalars['numeric']['input']>;
+  user_id?: InputMaybe<Scalars['Int']['input']>;
 };
 
 /** input type for inserting data into table "positions" */
@@ -592,6 +680,7 @@ export type Positions_Insert_Input = {
   pay_range_upper?: InputMaybe<Scalars['numeric']['input']>;
   posting_url?: InputMaybe<Scalars['String']['input']>;
   title?: InputMaybe<Scalars['String']['input']>;
+  user_id?: InputMaybe<Scalars['Int']['input']>;
 };
 
 /** aggregate max on columns */
@@ -603,6 +692,7 @@ export type Positions_Max_Fields = {
   pay_range_upper?: Maybe<Scalars['numeric']['output']>;
   posting_url?: Maybe<Scalars['String']['output']>;
   title?: Maybe<Scalars['String']['output']>;
+  user_id?: Maybe<Scalars['Int']['output']>;
 };
 
 /** order by max() on columns of table "positions" */
@@ -613,6 +703,7 @@ export type Positions_Max_Order_By = {
   pay_range_upper?: InputMaybe<Order_By>;
   posting_url?: InputMaybe<Order_By>;
   title?: InputMaybe<Order_By>;
+  user_id?: InputMaybe<Order_By>;
 };
 
 /** aggregate min on columns */
@@ -624,6 +715,7 @@ export type Positions_Min_Fields = {
   pay_range_upper?: Maybe<Scalars['numeric']['output']>;
   posting_url?: Maybe<Scalars['String']['output']>;
   title?: Maybe<Scalars['String']['output']>;
+  user_id?: Maybe<Scalars['Int']['output']>;
 };
 
 /** order by min() on columns of table "positions" */
@@ -634,6 +726,7 @@ export type Positions_Min_Order_By = {
   pay_range_upper?: InputMaybe<Order_By>;
   posting_url?: InputMaybe<Order_By>;
   title?: InputMaybe<Order_By>;
+  user_id?: InputMaybe<Order_By>;
 };
 
 /** response of any mutation on the table "positions" */
@@ -661,6 +754,7 @@ export type Positions_Order_By = {
   pay_range_upper?: InputMaybe<Order_By>;
   posting_url?: InputMaybe<Order_By>;
   title?: InputMaybe<Order_By>;
+  user_id?: InputMaybe<Order_By>;
 };
 
 /** primary key columns input for table: positions */
@@ -681,7 +775,9 @@ export enum Positions_Select_Column {
   /** column name */
   PostingUrl = 'posting_url',
   /** column name */
-  Title = 'title'
+  Title = 'title',
+  /** column name */
+  UserId = 'user_id'
 }
 
 /** input type for updating data in table "positions" */
@@ -692,6 +788,7 @@ export type Positions_Set_Input = {
   pay_range_upper?: InputMaybe<Scalars['numeric']['input']>;
   posting_url?: InputMaybe<Scalars['String']['input']>;
   title?: InputMaybe<Scalars['String']['input']>;
+  user_id?: InputMaybe<Scalars['Int']['input']>;
 };
 
 /** aggregate stddev on columns */
@@ -701,6 +798,7 @@ export type Positions_Stddev_Fields = {
   id?: Maybe<Scalars['Float']['output']>;
   pay_range_lower?: Maybe<Scalars['Float']['output']>;
   pay_range_upper?: Maybe<Scalars['Float']['output']>;
+  user_id?: Maybe<Scalars['Float']['output']>;
 };
 
 /** order by stddev() on columns of table "positions" */
@@ -709,6 +807,7 @@ export type Positions_Stddev_Order_By = {
   id?: InputMaybe<Order_By>;
   pay_range_lower?: InputMaybe<Order_By>;
   pay_range_upper?: InputMaybe<Order_By>;
+  user_id?: InputMaybe<Order_By>;
 };
 
 /** aggregate stddev_pop on columns */
@@ -718,6 +817,7 @@ export type Positions_Stddev_Pop_Fields = {
   id?: Maybe<Scalars['Float']['output']>;
   pay_range_lower?: Maybe<Scalars['Float']['output']>;
   pay_range_upper?: Maybe<Scalars['Float']['output']>;
+  user_id?: Maybe<Scalars['Float']['output']>;
 };
 
 /** order by stddev_pop() on columns of table "positions" */
@@ -726,6 +826,7 @@ export type Positions_Stddev_Pop_Order_By = {
   id?: InputMaybe<Order_By>;
   pay_range_lower?: InputMaybe<Order_By>;
   pay_range_upper?: InputMaybe<Order_By>;
+  user_id?: InputMaybe<Order_By>;
 };
 
 /** aggregate stddev_samp on columns */
@@ -735,6 +836,7 @@ export type Positions_Stddev_Samp_Fields = {
   id?: Maybe<Scalars['Float']['output']>;
   pay_range_lower?: Maybe<Scalars['Float']['output']>;
   pay_range_upper?: Maybe<Scalars['Float']['output']>;
+  user_id?: Maybe<Scalars['Float']['output']>;
 };
 
 /** order by stddev_samp() on columns of table "positions" */
@@ -743,6 +845,7 @@ export type Positions_Stddev_Samp_Order_By = {
   id?: InputMaybe<Order_By>;
   pay_range_lower?: InputMaybe<Order_By>;
   pay_range_upper?: InputMaybe<Order_By>;
+  user_id?: InputMaybe<Order_By>;
 };
 
 /** Streaming cursor of the table "positions" */
@@ -761,6 +864,7 @@ export type Positions_Stream_Cursor_Value_Input = {
   pay_range_upper?: InputMaybe<Scalars['numeric']['input']>;
   posting_url?: InputMaybe<Scalars['String']['input']>;
   title?: InputMaybe<Scalars['String']['input']>;
+  user_id?: InputMaybe<Scalars['Int']['input']>;
 };
 
 /** aggregate sum on columns */
@@ -770,6 +874,7 @@ export type Positions_Sum_Fields = {
   id?: Maybe<Scalars['Int']['output']>;
   pay_range_lower?: Maybe<Scalars['numeric']['output']>;
   pay_range_upper?: Maybe<Scalars['numeric']['output']>;
+  user_id?: Maybe<Scalars['Int']['output']>;
 };
 
 /** order by sum() on columns of table "positions" */
@@ -778,6 +883,7 @@ export type Positions_Sum_Order_By = {
   id?: InputMaybe<Order_By>;
   pay_range_lower?: InputMaybe<Order_By>;
   pay_range_upper?: InputMaybe<Order_By>;
+  user_id?: InputMaybe<Order_By>;
 };
 
 /** update columns of table "positions" */
@@ -793,7 +899,9 @@ export enum Positions_Update_Column {
   /** column name */
   PostingUrl = 'posting_url',
   /** column name */
-  Title = 'title'
+  Title = 'title',
+  /** column name */
+  UserId = 'user_id'
 }
 
 export type Positions_Updates = {
@@ -812,6 +920,7 @@ export type Positions_Var_Pop_Fields = {
   id?: Maybe<Scalars['Float']['output']>;
   pay_range_lower?: Maybe<Scalars['Float']['output']>;
   pay_range_upper?: Maybe<Scalars['Float']['output']>;
+  user_id?: Maybe<Scalars['Float']['output']>;
 };
 
 /** order by var_pop() on columns of table "positions" */
@@ -820,6 +929,7 @@ export type Positions_Var_Pop_Order_By = {
   id?: InputMaybe<Order_By>;
   pay_range_lower?: InputMaybe<Order_By>;
   pay_range_upper?: InputMaybe<Order_By>;
+  user_id?: InputMaybe<Order_By>;
 };
 
 /** aggregate var_samp on columns */
@@ -829,6 +939,7 @@ export type Positions_Var_Samp_Fields = {
   id?: Maybe<Scalars['Float']['output']>;
   pay_range_lower?: Maybe<Scalars['Float']['output']>;
   pay_range_upper?: Maybe<Scalars['Float']['output']>;
+  user_id?: Maybe<Scalars['Float']['output']>;
 };
 
 /** order by var_samp() on columns of table "positions" */
@@ -837,6 +948,7 @@ export type Positions_Var_Samp_Order_By = {
   id?: InputMaybe<Order_By>;
   pay_range_lower?: InputMaybe<Order_By>;
   pay_range_upper?: InputMaybe<Order_By>;
+  user_id?: InputMaybe<Order_By>;
 };
 
 /** aggregate variance on columns */
@@ -846,6 +958,7 @@ export type Positions_Variance_Fields = {
   id?: Maybe<Scalars['Float']['output']>;
   pay_range_lower?: Maybe<Scalars['Float']['output']>;
   pay_range_upper?: Maybe<Scalars['Float']['output']>;
+  user_id?: Maybe<Scalars['Float']['output']>;
 };
 
 /** order by variance() on columns of table "positions" */
@@ -854,6 +967,7 @@ export type Positions_Variance_Order_By = {
   id?: InputMaybe<Order_By>;
   pay_range_lower?: InputMaybe<Order_By>;
   pay_range_upper?: InputMaybe<Order_By>;
+  user_id?: InputMaybe<Order_By>;
 };
 
 export type Query_Root = {
@@ -870,6 +984,12 @@ export type Query_Root = {
   positions_aggregate: Positions_Aggregate;
   /** fetch data from the table: "positions" using primary key columns */
   positions_by_pk?: Maybe<Positions>;
+  /** fetch data from the table: "users" */
+  users: Array<Users>;
+  /** fetch aggregated fields from the table: "users" */
+  users_aggregate: Users_Aggregate;
+  /** fetch data from the table: "users" using primary key columns */
+  users_by_pk?: Maybe<Users>;
 };
 
 
@@ -918,6 +1038,29 @@ export type Query_RootPositions_By_PkArgs = {
   id: Scalars['Int']['input'];
 };
 
+
+export type Query_RootUsersArgs = {
+  distinct_on?: InputMaybe<Array<Users_Select_Column>>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  order_by?: InputMaybe<Array<Users_Order_By>>;
+  where?: InputMaybe<Users_Bool_Exp>;
+};
+
+
+export type Query_RootUsers_AggregateArgs = {
+  distinct_on?: InputMaybe<Array<Users_Select_Column>>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  order_by?: InputMaybe<Array<Users_Order_By>>;
+  where?: InputMaybe<Users_Bool_Exp>;
+};
+
+
+export type Query_RootUsers_By_PkArgs = {
+  id: Scalars['Int']['input'];
+};
+
 export type Subscription_Root = {
   __typename?: 'subscription_root';
   /** fetch data from the table: "employers" */
@@ -936,6 +1079,14 @@ export type Subscription_Root = {
   positions_by_pk?: Maybe<Positions>;
   /** fetch data from the table in a streaming manner: "positions" */
   positions_stream: Array<Positions>;
+  /** fetch data from the table: "users" */
+  users: Array<Users>;
+  /** fetch aggregated fields from the table: "users" */
+  users_aggregate: Users_Aggregate;
+  /** fetch data from the table: "users" using primary key columns */
+  users_by_pk?: Maybe<Users>;
+  /** fetch data from the table in a streaming manner: "users" */
+  users_stream: Array<Users>;
 };
 
 
@@ -998,8 +1149,224 @@ export type Subscription_RootPositions_StreamArgs = {
   where?: InputMaybe<Positions_Bool_Exp>;
 };
 
+
+export type Subscription_RootUsersArgs = {
+  distinct_on?: InputMaybe<Array<Users_Select_Column>>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  order_by?: InputMaybe<Array<Users_Order_By>>;
+  where?: InputMaybe<Users_Bool_Exp>;
+};
+
+
+export type Subscription_RootUsers_AggregateArgs = {
+  distinct_on?: InputMaybe<Array<Users_Select_Column>>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  order_by?: InputMaybe<Array<Users_Order_By>>;
+  where?: InputMaybe<Users_Bool_Exp>;
+};
+
+
+export type Subscription_RootUsers_By_PkArgs = {
+  id: Scalars['Int']['input'];
+};
+
+
+export type Subscription_RootUsers_StreamArgs = {
+  batch_size: Scalars['Int']['input'];
+  cursor: Array<InputMaybe<Users_Stream_Cursor_Input>>;
+  where?: InputMaybe<Users_Bool_Exp>;
+};
+
+/** columns and relationships of "users" */
+export type Users = {
+  __typename?: 'users';
+  id: Scalars['Int']['output'];
+};
+
+/** aggregated selection of "users" */
+export type Users_Aggregate = {
+  __typename?: 'users_aggregate';
+  aggregate?: Maybe<Users_Aggregate_Fields>;
+  nodes: Array<Users>;
+};
+
+/** aggregate fields of "users" */
+export type Users_Aggregate_Fields = {
+  __typename?: 'users_aggregate_fields';
+  avg?: Maybe<Users_Avg_Fields>;
+  count: Scalars['Int']['output'];
+  max?: Maybe<Users_Max_Fields>;
+  min?: Maybe<Users_Min_Fields>;
+  stddev?: Maybe<Users_Stddev_Fields>;
+  stddev_pop?: Maybe<Users_Stddev_Pop_Fields>;
+  stddev_samp?: Maybe<Users_Stddev_Samp_Fields>;
+  sum?: Maybe<Users_Sum_Fields>;
+  var_pop?: Maybe<Users_Var_Pop_Fields>;
+  var_samp?: Maybe<Users_Var_Samp_Fields>;
+  variance?: Maybe<Users_Variance_Fields>;
+};
+
+
+/** aggregate fields of "users" */
+export type Users_Aggregate_FieldsCountArgs = {
+  columns?: InputMaybe<Array<Users_Select_Column>>;
+  distinct?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
+/** aggregate avg on columns */
+export type Users_Avg_Fields = {
+  __typename?: 'users_avg_fields';
+  id?: Maybe<Scalars['Float']['output']>;
+};
+
+/** Boolean expression to filter rows from the table "users". All fields are combined with a logical 'AND'. */
+export type Users_Bool_Exp = {
+  _and?: InputMaybe<Array<Users_Bool_Exp>>;
+  _not?: InputMaybe<Users_Bool_Exp>;
+  _or?: InputMaybe<Array<Users_Bool_Exp>>;
+  id?: InputMaybe<Int_Comparison_Exp>;
+};
+
+/** unique or primary key constraints on table "users" */
+export enum Users_Constraint {
+  /** unique or primary key constraint on columns "id" */
+  UsersPkey = 'users_pkey'
+}
+
+/** input type for incrementing numeric columns in table "users" */
+export type Users_Inc_Input = {
+  id?: InputMaybe<Scalars['Int']['input']>;
+};
+
+/** input type for inserting data into table "users" */
+export type Users_Insert_Input = {
+  id?: InputMaybe<Scalars['Int']['input']>;
+};
+
+/** aggregate max on columns */
+export type Users_Max_Fields = {
+  __typename?: 'users_max_fields';
+  id?: Maybe<Scalars['Int']['output']>;
+};
+
+/** aggregate min on columns */
+export type Users_Min_Fields = {
+  __typename?: 'users_min_fields';
+  id?: Maybe<Scalars['Int']['output']>;
+};
+
+/** response of any mutation on the table "users" */
+export type Users_Mutation_Response = {
+  __typename?: 'users_mutation_response';
+  /** number of rows affected by the mutation */
+  affected_rows: Scalars['Int']['output'];
+  /** data from the rows affected by the mutation */
+  returning: Array<Users>;
+};
+
+/** on_conflict condition type for table "users" */
+export type Users_On_Conflict = {
+  constraint: Users_Constraint;
+  update_columns?: Array<Users_Update_Column>;
+  where?: InputMaybe<Users_Bool_Exp>;
+};
+
+/** Ordering options when selecting data from "users". */
+export type Users_Order_By = {
+  id?: InputMaybe<Order_By>;
+};
+
+/** primary key columns input for table: users */
+export type Users_Pk_Columns_Input = {
+  id: Scalars['Int']['input'];
+};
+
+/** select columns of table "users" */
+export enum Users_Select_Column {
+  /** column name */
+  Id = 'id'
+}
+
+/** input type for updating data in table "users" */
+export type Users_Set_Input = {
+  id?: InputMaybe<Scalars['Int']['input']>;
+};
+
+/** aggregate stddev on columns */
+export type Users_Stddev_Fields = {
+  __typename?: 'users_stddev_fields';
+  id?: Maybe<Scalars['Float']['output']>;
+};
+
+/** aggregate stddev_pop on columns */
+export type Users_Stddev_Pop_Fields = {
+  __typename?: 'users_stddev_pop_fields';
+  id?: Maybe<Scalars['Float']['output']>;
+};
+
+/** aggregate stddev_samp on columns */
+export type Users_Stddev_Samp_Fields = {
+  __typename?: 'users_stddev_samp_fields';
+  id?: Maybe<Scalars['Float']['output']>;
+};
+
+/** Streaming cursor of the table "users" */
+export type Users_Stream_Cursor_Input = {
+  /** Stream column input with initial value */
+  initial_value: Users_Stream_Cursor_Value_Input;
+  /** cursor ordering */
+  ordering?: InputMaybe<Cursor_Ordering>;
+};
+
+/** Initial value of the column from where the streaming should start */
+export type Users_Stream_Cursor_Value_Input = {
+  id?: InputMaybe<Scalars['Int']['input']>;
+};
+
+/** aggregate sum on columns */
+export type Users_Sum_Fields = {
+  __typename?: 'users_sum_fields';
+  id?: Maybe<Scalars['Int']['output']>;
+};
+
+/** update columns of table "users" */
+export enum Users_Update_Column {
+  /** column name */
+  Id = 'id'
+}
+
+export type Users_Updates = {
+  /** increments the numeric columns with given value of the filtered values */
+  _inc?: InputMaybe<Users_Inc_Input>;
+  /** sets the columns of the filtered rows to the given values */
+  _set?: InputMaybe<Users_Set_Input>;
+  /** filter the rows which have to be updated */
+  where: Users_Bool_Exp;
+};
+
+/** aggregate var_pop on columns */
+export type Users_Var_Pop_Fields = {
+  __typename?: 'users_var_pop_fields';
+  id?: Maybe<Scalars['Float']['output']>;
+};
+
+/** aggregate var_samp on columns */
+export type Users_Var_Samp_Fields = {
+  __typename?: 'users_var_samp_fields';
+  id?: Maybe<Scalars['Float']['output']>;
+};
+
+/** aggregate variance on columns */
+export type Users_Variance_Fields = {
+  __typename?: 'users_variance_fields';
+  id?: Maybe<Scalars['Float']['output']>;
+};
+
 export type EmployersQueryVariables = Exact<{
   limit?: Scalars['Int']['input'];
+  user_id: Scalars['Int']['input'];
 }>;
 
 
@@ -1014,8 +1381,8 @@ export type PositionsQuery = { __typename?: 'query_root', positions: Array<{ __t
 
 
 export const EmployersDocument = gql`
-    query employers($limit: Int! = 10) {
-  employers(limit: $limit) {
+    query employers($limit: Int! = 10, $user_id: Int!) {
+  employers(where: {user_id: {_eq: $user_id}}, limit: $limit) {
     id
     name
   }
@@ -1040,7 +1407,7 @@ const defaultWrapper: SdkFunctionWrapper = (action, _operationName, _operationTy
 
 export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = defaultWrapper) {
   return {
-    employers(variables?: EmployersQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<EmployersQuery> {
+    employers(variables: EmployersQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<EmployersQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<EmployersQuery>(EmployersDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'employers', 'query', variables);
     },
     positions(variables?: PositionsQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<PositionsQuery> {
