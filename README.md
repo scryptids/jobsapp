@@ -25,29 +25,19 @@ docker compose up -d
 
 # Apply Hasura metadata, run migrations, then seed database
 $Env:HASURA_GRAPHQL_ADMIN_SECRET = <value from .env file>
-cd hasura
+Push-Location hasura
 hasura metadata apply;
 hasura migrate apply --database-name default;
 hasura seed apply --database-name default;
 hasura metadata reload;
+Pop-Location
 
 # Open Hasura console in browser
 [System.Diagnostics.Process]::Start("http://localhost:8080/console")
 ```
 
-#### POSIX shell
-```bash
-# Create and run containers
-docker compose up -d
+#### bash/zsh
 
-# Apply Hasura metadata, run migrations, then seed database
-set -a; source www/.env; set +a;
-cd hasura;
-hasura metadata apply;
-hasura migrate apply --database-name default;
-hasura seed apply --database-name default;
-hasura metadata reload;
+There is a convenience script at `./tools/init-hasura.sh` to automate this process.
 
-# Open Hasura console in browser
-open http://localhost:8080/console
-```
+It's recommended to run the script with the -y flag, otherwise it may fail in situations where the database has already been seeded and you try to insert data that violates uniqueness constraints.

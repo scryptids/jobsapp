@@ -1,6 +1,6 @@
 import { CodegenConfig } from '@graphql-codegen/cli'
 
-const endpoint = process.env.GRAPHQL_ENDPOINT || 'http://localhost:8080/v1/graphql'
+const endpoint = process.env.GRAPHQL_API_URL || 'http://localhost:8080/v1/graphql'
 const hasuraAdminSecret = process.env.HASURA_GRAPHQL_ADMIN_SECRET
 if (!hasuraAdminSecret) {
   throw new Error('HASURA_GRAPHQL_ADMIN_SECRET is required')
