@@ -41,3 +41,13 @@ Pop-Location
 There is a convenience script at `./tools/init-hasura.sh` to automate this process.
 
 It's recommended to run the script with the -y flag, otherwise it may fail in situations where the database has already been seeded and you try to insert data that violates uniqueness constraints.
+
+## Querying local Hasura GraphQL instance with cURL
+
+```bash
+# the --json flag is a shortcut for using the POST method and setting the necessary headers for sending and receiving JSON
+curl --header "x-hasura-admin-secret: $HASURA_GRAPHQL_ADMIN_SECRET" \
+    --json '{"query": "{ __schema { queryType { fields { name description } } } }"}' \
+    http://localhost:8080/v1/graphql \
+    | jq
+```
