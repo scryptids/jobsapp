@@ -5,4 +5,5 @@
 
 export * from './EventButton/EventButton'
 export * from './Header/Header'
+export * from './JobsTable/JobsTable'
 export * from './LoginCredentialsForm/LoginCredentialsForm'

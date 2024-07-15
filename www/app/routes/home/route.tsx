@@ -1,6 +1,8 @@
 import { LoaderFunctionArgs, json } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
+
 import { PositionsQuery } from "~/graphql/_generated";
+import { JobsTable } from "~/components";
 
 import {
   requireAuthSession,
@@ -29,13 +31,7 @@ export default function Posts() {
   return (
     <main>
       <h1>Jobs</h1>
-      <ul>
-        {positions.map((job) => (
-          <li key={job.id}>
-            <p>{job.title}</p>
-          </li>
-        ))}
-      </ul>
+      <JobsTable jobsData={positions}/>
     </main>
   );
 }
