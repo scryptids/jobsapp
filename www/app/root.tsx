@@ -17,7 +17,7 @@ import {
   ScrollRestoration,
   useLoaderData,
 } from "@remix-run/react";
-import { ColorSchemeScript, MantineProvider, AppShell } from '@mantine/core';
+import { ColorSchemeScript, MantineProvider, AppShell, createTheme } from '@mantine/core';
 
 import { sessionStorage } from '~/sessions';
 import { Header } from '~/components/Header/Header';
@@ -46,6 +46,10 @@ export async function loader({ request }: LoaderFunctionArgs) {
 export function Layout({ children }: { children: React.ReactNode }) {
   let data = useLoaderData<typeof loader>();
 
+  // add color overrides or customizations here
+  const theme = createTheme({
+  });
+
   return (
     <html lang="en">
       <head>
@@ -56,7 +60,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <ColorSchemeScript />
       </head>
       <body>
-        <MantineProvider>
+        <MantineProvider theme={theme}>
           <AppShell
             header={{ height: 60 }}
             navbar={{

@@ -3,16 +3,20 @@
  * @module
  */
 
-import { useReactTable, getCoreRowModel, flexRender } from "@tanstack/react-table";
+import { useReactTable, getCoreRowModel, flexRender, ColumnDef } from "@tanstack/react-table";
 
+import { type Positions } from "~/graphql/_generated";
 import classes from "./JobsTable.module.css";
+import { JobsTableRowMenu } from "../JobsTableRowMenu/JobsTableRowMenu";
+
 
 export interface JobsTableProps {
-  jobsData: any
+  jobsData: Array<Positions>
 }
 
 export function JobsTable(props: JobsTableProps) {
-  const columns = [
+  const deleteJob = (jobId: number) => { alert(`deleting ${jobId}`)}
+  const columns: ColumnDef<Positions>[] = [
     {
       header: 'Title',
       accessorKey: 'title',
@@ -21,6 +25,12 @@ export function JobsTable(props: JobsTableProps) {
       header: 'Employer',
       accessorKey: 'employer.name',
     },
+    {
+      id: 'menu',
+      header: () => null,
+      accessorFn: row => row,
+      cell: ({ row }) => <JobsTableRowMenu job={row} deleteJob={deleteJob} />,
+    }
   ]
   const table = useReactTable({
     data: props.jobsData,
@@ -29,7 +39,7 @@ export function JobsTable(props: JobsTableProps) {
   })
 
   return (
-    <table>
+    <table className={classes.jobs_table}>
       <thead>
         {table.getHeaderGroups().map(headerGroup => (
           <tr key={headerGroup.id}>
@@ -51,7 +61,7 @@ export function JobsTable(props: JobsTableProps) {
         {table.getRowModel().rows.map(row => (
           <tr key={row.id}>
             {row.getVisibleCells().map(cell => (
-              <td key={cell.id}>
+              <td key={cell.id} tabIndex={-1}>
                 {flexRender(cell.column.columnDef.cell, cell.getContext())}
               </td>
             ))}

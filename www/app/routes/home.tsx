@@ -1,7 +1,7 @@
 import { LoaderFunctionArgs, json } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 
-import { PositionsQuery } from "~/graphql/_generated";
+import { type Positions, PositionsQuery } from "~/graphql/_generated";
 import { JobsTable } from "~/components";
 
 import {
@@ -31,7 +31,7 @@ export default function Posts() {
   return (
     <main>
       <h1>Jobs</h1>
-      <JobsTable jobsData={positions}/>
+      <JobsTable jobsData={positions as Array<Positions>}/>
     </main>
   );
 }

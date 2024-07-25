@@ -1,3 +1,21 @@
+.jobs_table {
+}
+
+/* .jobs_table tr {
+    cursor: pointer;
+} */
+
+/* .jobs_table tr:nth-child(odd) {
+} */
+
+.jobs_table tr:nth-child(even) {
+    background-color: #eeeeee;
+}
+
+.jobs_table tr:hover {
+    background-color: #dddddd
+}
+
 .column_header {
     text-align: left;
 }
