@@ -1,18 +1,15 @@
 /**
  * Utilities for interpreting XState state machines.
- * 
+ *
  * This code has been adapted from Erik Rasmussen's 2022 Remix Conf demo.
  * @see https://www.youtube.com/watch?v=r4xI6LPf6iQ
  * @see https://github.com/erikras/remix-conf-2022
- * 
+ *
  * @module
  */
 
-import { Session } from "@remix-run/node";
+import { type Session } from "react-router";
 import {
-  EventFromLogic,
-  Snapshot,
-  SnapshotFrom,
   createActor,
   setup,
   fromCallback,
@@ -22,28 +19,34 @@ import {
   sendTo,
   type AnyActorLogic,
   type AnyActorRef,
+  type EventFromLogic,
+  type Snapshot,
+  type SnapshotFrom,
 } from "xstate";
 
 function pausedOrDonePredicate(emitted: SnapshotFrom<AnyActorRef>): boolean {
-  if (emitted.status === 'done') {
-    return true
+  if (emitted.status === "done") {
+    return true;
   }
   if (emitted.hasTag("pause")) {
-    return true
+    return true;
   }
-  return false
+  return false;
 }
 
-const DEFAULT_TIMEOUT = 2_000
+const DEFAULT_TIMEOUT = 2_000;
 
 export interface AsyncInterpretOptions {
-  timeoutMs?: number
-  input?: Record<any, any>,
-  initialState?: Snapshot<any>,
-  initialEvent?: EventFromLogic<AnyActorLogic>,
+  timeoutMs?: number;
+  input?: Record<any, any>;
+  initialState?: Snapshot<any>;
+  initialEvent?: EventFromLogic<AnyActorLogic>;
 }
 
-export async function asyncInterpret(logic: AnyActorLogic, options?: AsyncInterpretOptions) {
+export async function asyncInterpret(
+  logic: AnyActorLogic,
+  options?: AsyncInterpretOptions
+) {
   const actor = createActor(logic, {
     snapshot: options?.initialState,
     input: options?.input,
@@ -52,44 +55,43 @@ export async function asyncInterpret(logic: AnyActorLogic, options?: AsyncInterp
   if (options?.initialEvent) {
     actor.send(options?.initialEvent);
   }
-  return await waitFor(
-    actor,
-    pausedOrDonePredicate,
-    { timeout: options?.timeoutMs ?? DEFAULT_TIMEOUT }
-  );
+  return await waitFor(actor, pausedOrDonePredicate, {
+    timeout: options?.timeoutMs ?? DEFAULT_TIMEOUT,
+  });
 }
 
 if (import.meta.vitest) {
-  const { it, expect } = import.meta.vitest
+  const { it, expect } = import.meta.vitest;
 
   {
     // test to see if asyncInterpret can run a machine with an eventless transition to get to the final state
-    const simpleAlwaysMachine = setup({
-    }).createMachine({
-      id: 'simple_always',
-      initial: 'initial_state',
+    const simpleAlwaysMachine = setup({}).createMachine({
+      id: "simple_always",
+      initial: "initial_state",
       states: {
         initial_state: {
           always: {
-            target: 'final_state',
+            target: "final_state",
           },
         },
         final_state: {
-          type: 'final',
+          type: "final",
         },
       },
       output: {
-        message: 'elementary_watson'
-      }
-    })
+        message: "elementary_watson",
+      },
+    });
 
-    it('interprets a machine with an always transition', async () => {
-      const state = await asyncInterpret(simpleAlwaysMachine, { timeoutMs: 100 })
-      expect(state.status).toBe('done')
-      expect(state.value).toBe('final_state')
-      expect(state.output.message).toBe('elementary_watson')
-      expect(state.error).toBeUndefined()
-    })
+    it("interprets a machine with an always transition", async () => {
+      const state = await asyncInterpret(simpleAlwaysMachine, {
+        timeoutMs: 100,
+      });
+      expect(state.status).toBe("done");
+      expect(state.value).toBe("final_state");
+      expect(state.output.message).toBe("elementary_watson");
+      expect(state.error).toBeUndefined();
+    });
   }
 
   {
@@ -97,197 +99,201 @@ if (import.meta.vitest) {
     const simpleHaltingMachine = setup({
       actors: {
         noOpLogic: fromCallback((_) => {
-          return () => {}
+          return () => {};
         }),
       },
     }).createMachine({
-      id: 'simple_halting',
-      initial: 'initial_state',
+      id: "simple_halting",
+      initial: "initial_state",
       states: {
         initial_state: {
           invoke: {
-            id: 'no_op',
-            src: 'noOpLogic',
+            id: "no_op",
+            src: "noOpLogic",
           },
         },
         final_state: {
-          type: 'final',
+          type: "final",
         },
       },
-    })
+    });
 
-    it('times-out a halted machine', async () => {
-      await expect(asyncInterpret(simpleHaltingMachine, { timeoutMs: 100 })).rejects.toThrow('Timeout of 100 ms exceeded')
-    })
+    it("times-out a halted machine", async () => {
+      await expect(
+        asyncInterpret(simpleHaltingMachine, { timeoutMs: 100 })
+      ).rejects.toThrow("Timeout of 100 ms exceeded");
+    });
   }
 
   {
     // test a mocked login flow using a callback-based child machine
 
     type LoginMachineEvent =
-      | { type: 'creds.submit', username: string, password: string }
-      | { type: 'creds.error', message: string }
-      | { type: 'creds.invalid' }
-      | { type: 'creds.valid', userId: string }
+      | { type: "creds.submit"; username: string; password: string }
+      | { type: "creds.error"; message: string }
+      | { type: "creds.invalid" }
+      | { type: "creds.valid"; userId: string };
 
     const callbackActorLoginMachine = setup({
       types: {
-        context: {} as { userId?: string, attempts: number },
+        context: {} as { userId?: string; attempts: number },
         events: {} as LoginMachineEvent,
         input: {} as { attempts?: number },
       },
       actors: {
         loginLogic: fromCallback<LoginMachineEvent>(({ sendBack, receive }) => {
-          receive(event => {
-            if (event.type === 'creds.submit') {
+          receive((event) => {
+            if (event.type === "creds.submit") {
               if (!event.username || !event.password) {
-                sendBack({ type: 'creds.error', message: 'missing username and/or password'})
-                return
+                sendBack({
+                  type: "creds.error",
+                  message: "missing username and/or password",
+                });
+                return;
               }
-      
-              if (event.username === 'admin' && event.password === 'password') {
-                sendBack({ type: 'creds.valid', userId: '1' })
+
+              if (event.username === "admin" && event.password === "password") {
+                sendBack({ type: "creds.valid", userId: "1" });
               } else {
-                sendBack({ type: 'creds.invalid' })
+                sendBack({ type: "creds.invalid" });
               }
             }
-          })
-      
+          });
+
           // cleanup function
-          return () => {
-          }
+          return () => {};
         }),
       },
     }).createMachine({
-      id: 'simple_login',
+      id: "simple_login",
       context: ({ input }) => ({
         userId: undefined,
-        attempts: input?.attempts ?? 0
+        attempts: input?.attempts ?? 0,
       }),
-      initial: 'login',
+      initial: "login",
       states: {
         login: {
-          tags: ['pause'],
+          tags: ["pause"],
           always: {
             guard: ({ context }) => context.attempts > 3,
-            target: 'failure',
+            target: "failure",
           },
           invoke: {
-            id: 'loginChild',
-            src: 'loginLogic',
+            id: "loginChild",
+            src: "loginLogic",
           },
           on: {
             "creds.submit": {
               actions: [
-                sendTo('loginChild', ({ event }) => event),
-                assign({ attempts: ({context}) => context.attempts + 1 })
+                sendTo("loginChild", ({ event }) => event),
+                assign({ attempts: ({ context }) => context.attempts + 1 }),
               ],
             },
-            "creds.valid" : {
-              target: 'success',
+            "creds.valid": {
+              target: "success",
               actions: assign({
-                userId: ({ event }) => event.userId
-              })
+                userId: ({ event }) => event.userId,
+              }),
             },
           },
           onError: {
-            target: 'failure',
+            target: "failure",
           },
         },
         success: {
-          type: 'final',
+          type: "final",
         },
         failure: {
-          type: 'final',
+          type: "final",
         },
       },
       output: ({ context }) => ({
         userId: context.userId,
-      })
-    })
+      }),
+    });
 
-    it('callback-based login machine processes an action', async () => {
+    it("callback-based login machine processes an action", async () => {
       const state = await asyncInterpret(callbackActorLoginMachine, {
         timeoutMs: 100,
         initialEvent: {
-          type: 'creds.submit',
-          username: 'admin',
-          password: 'password',
+          type: "creds.submit",
+          username: "admin",
+          password: "password",
         },
-      })
-      expect(state.status).toBe('done')
-      expect(state.value).toBe('success')
-      expect(state.output.userId).toBe('1')
-      expect(state.error).toBeUndefined()
-    })
+      });
+      expect(state.status).toBe("done");
+      expect(state.value).toBe("success");
+      expect(state.output.userId).toBe("1");
+      expect(state.error).toBeUndefined();
+    });
 
-    it('callback-based login machine limits max attempts', async () => {
+    it("callback-based login machine limits max attempts", async () => {
       let state = await asyncInterpret(callbackActorLoginMachine, {
         timeoutMs: 100,
         initialEvent: {
-          type: 'creds.submit',
-          username: 'admin',
-          password: 'admin',
+          type: "creds.submit",
+          username: "admin",
+          password: "admin",
         },
-      })
-      expect(state.value).toBe('login')
-      expect(state.context).toStrictEqual({ userId: undefined, attempts: 1 })
+      });
+      expect(state.value).toBe("login");
+      expect(state.context).toStrictEqual({ userId: undefined, attempts: 1 });
       state = await asyncInterpret(callbackActorLoginMachine, {
         timeoutMs: 100,
         initialState: state,
         initialEvent: {
-          type: 'creds.submit',
-          username: 'admin',
-          password: '123456',
+          type: "creds.submit",
+          username: "admin",
+          password: "123456",
         },
-      })
-      expect(state.value).toBe('login')
-      expect(state.context).toStrictEqual({ userId: undefined, attempts: 2 })
+      });
+      expect(state.value).toBe("login");
+      expect(state.context).toStrictEqual({ userId: undefined, attempts: 2 });
       state = await asyncInterpret(callbackActorLoginMachine, {
         timeoutMs: 100,
         initialState: state,
         initialEvent: {
-          type: 'creds.submit',
-          username: 'admin',
-          password: 'baseball',
+          type: "creds.submit",
+          username: "admin",
+          password: "baseball",
         },
-      })
-      expect(state.value).toBe('login')
-      expect(state.context).toStrictEqual({ userId: undefined, attempts: 3 })
+      });
+      expect(state.value).toBe("login");
+      expect(state.context).toStrictEqual({ userId: undefined, attempts: 3 });
       state = await asyncInterpret(callbackActorLoginMachine, {
         timeoutMs: 100,
         initialState: state,
         initialEvent: {
-          type: 'creds.submit',
-          username: 'admin',
-          password: 'football',
+          type: "creds.submit",
+          username: "admin",
+          password: "football",
         },
-      })
-      expect(state.value).toBe('failure')
-      expect(state.context).toStrictEqual({ userId: undefined, attempts: 4 })
-    })
+      });
+      expect(state.value).toBe("failure");
+      expect(state.context).toStrictEqual({ userId: undefined, attempts: 4 });
+    });
 
-    it('callback-based login machine initializes context using input', async () => {
+    it("callback-based login machine initializes context using input", async () => {
       const state = await asyncInterpret(callbackActorLoginMachine, {
         timeoutMs: 100,
         initialEvent: {
-          type: 'creds.submit',
-          username: 'admin',
-          password: 'password',
+          type: "creds.submit",
+          username: "admin",
+          password: "password",
         },
-        input: { attempts: 3, },
+        input: { attempts: 3 },
       });
-      expect(state.status).toBe('done')
-      expect(state.value).toBe('failure')
-    })
+      expect(state.status).toBe("done");
+      expect(state.value).toBe("failure");
+    });
   }
 
   {
     // test having a child actor mutate an external object
 
     type MockSession = {
-      userId: number,
-    }
+      userId: number;
+    };
 
     const autologinMachine = setup({
       types: {
@@ -297,42 +303,42 @@ if (import.meta.vitest) {
       actors: {
         initSession: fromPromise(async ({ input }) => {
           // @ts-ignore
-          input.session.userId = 1
-        })
+          input.session.userId = 1;
+        }),
       },
     }).createMachine({
-      id: 'auto_login_machine',
+      id: "auto_login_machine",
       context: ({ input }) => ({
         session: input.session,
       }),
-      initial: 'start',
+      initial: "start",
       states: {
         start: {
           invoke: {
-            id: 'session_init_actor',
-            src: 'initSession',
+            id: "session_init_actor",
+            src: "initSession",
             input: ({ context: { session } }) => ({ session }),
             onDone: {
-              target: '/home',
+              target: "/home",
             },
           },
         },
         "/home": {
-          type: 'final',
+          type: "final",
         },
       },
-    })
+    });
 
-    it('state machine with promise child actor mutates external object', async () => {
+    it("state machine with promise child actor mutates external object", async () => {
       const session: Partial<MockSession> = {
         userId: undefined,
-      }
+      };
       const state = await asyncInterpret(autologinMachine, {
         timeoutMs: 100,
         input: { session: session },
-      })
-      expect(session.userId).toBe(1)
-      expect(state.status).toBe('done')
-    })
+      });
+      expect(session.userId).toBe(1);
+      expect(state.status).toBe("done");
+    });
   }
 }

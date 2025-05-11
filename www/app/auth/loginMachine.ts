@@ -1,11 +1,11 @@
 /**
  * Definitions for login state machines.
- * 
+ *
  * In development, the mock login machine is used.
  * @module
  */
 
-import { Session } from "@remix-run/node";
+import { type Session } from "react-router";
 import { setup, fromPromise, assign } from "xstate";
 
 import { initSession } from "~/sessions";
@@ -18,37 +18,37 @@ const _autologinMachine = setup({
   actors: {
     initSession: fromPromise(async ({ input }) => {
       // @ts-ignore
-      return initSession(input.session, 1)
-    })
+      return initSession(input.session, 1);
+    }),
   },
 }).createMachine({
-  id: 'auto_login_machine',
+  id: "auto_login_machine",
   context: ({ input }) => ({
     session: input.session,
   }),
-  initial: 'start',
+  initial: "start",
   states: {
     start: {
       invoke: {
-        id: 'session_init_actor',
-        src: 'initSession',
+        id: "session_init_actor",
+        src: "initSession",
         input: ({ context: { session } }) => ({ session }),
         onDone: {
-          target: '/home',
+          target: "/home",
           // @ts-ignore
-          actions: assign({ session: ({ event }) => event.output })
+          actions: assign({ session: ({ event }) => event.output }),
         },
       },
     },
     "/home": {
-      type: 'final',
-      tags: ['success'],
+      type: "final",
+      tags: ["success"],
     },
   },
   output: ({ context }) => ({
     session: context.session,
   }),
-})
+});
 
 // const _loginMachine = setup({
 //   types: {
@@ -79,7 +79,7 @@ const _autologinMachine = setup({
 /**
  * The login state machine.
  */
-export const loginMachine = _autologinMachine
+export const loginMachine = _autologinMachine;
 // export const loginMachine = (process.env.NODE_ENV === "development")
 //   ? _mockLoginMachine
 //   : _loginMachine

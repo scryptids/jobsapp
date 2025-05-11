@@ -3,7 +3,7 @@
  * @module cookies
  */
 
-import { createCookie } from "@remix-run/node";
+import { createCookie } from "react-router";
 
 /**
  * A cookie that stores the state of the signup state machine.

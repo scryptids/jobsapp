@@ -1,5 +1,5 @@
 import { Button, Container, TextInput } from "@mantine/core";
-import { Form, Link } from "@remix-run/react";
+import { Form, Link } from "react-router";
 
 export interface LoginCredentialsFormProps {
   error?: string;

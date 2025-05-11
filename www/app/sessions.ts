@@ -1,23 +1,22 @@
 import {
   createCookie,
-  createCookieSessionStorage,
-  // createMemorySessionStorage,
+  createCookieSessionStorage, // createMemorySessionStorage,
   // createSessionStorage,
   redirect,
-  Session,
+  type Session,
   type SessionStorage,
-} from "@remix-run/node";
+} from "react-router";
 
 import { generateHasuraJWT } from "./auth";
 
 type SessionData = {
   userId: string;
   hasuraAccessToken: string;
-}
+};
 
 type SessionFlashData = {
   error: string;
-}
+};
 
 export function getSessionUserId(session: Session) {
   return session.get("userId");
@@ -27,8 +26,11 @@ export function getSessionHasuraToken(session: Session) {
   return session.get("hasuraAccessToken");
 }
 
-export async function initSession(session: Session, userId: number ): Promise<Session> {
-  session.set("userId", userId)
+export async function initSession(
+  session: Session,
+  userId: number
+): Promise<Session> {
+  session.set("userId", userId);
 
   const hasuraAccessToken = await generateHasuraJWT({
     defaultRole: "user",
@@ -36,16 +38,16 @@ export async function initSession(session: Session, userId: number ): Promise<Se
     otherClaims: {
       "X-Hasura-User-Id": userId.toString(),
     },
-  })
-  session.set("hasuraAccessToken", hasuraAccessToken)
+  });
+  session.set("hasuraAccessToken", hasuraAccessToken);
 
-  return session
+  return session;
 }
 
 let secret = process.env.COOKIE_SECRET || "default";
 if (secret === "default") {
   console.warn(
-    "🚨 No COOKIE_SECRET environment variable set, using 'default'. The app is insecure in production.",
+    "🚨 No COOKIE_SECRET environment variable set, using 'default'. The app is insecure in production."
   );
   secret = "default-secret";
 }
@@ -85,16 +87,21 @@ const sessionCookie = createCookie("__session", {
 //     cookie: sessionCookie,
 //   });
 // }
-const _sessionStorage = createCookieSessionStorage<SessionData, SessionFlashData>({ cookie: sessionCookie })
+const _sessionStorage = createCookieSessionStorage<
+  SessionData,
+  SessionFlashData
+>({ cookie: sessionCookie });
 
 if (typeof _sessionStorage === "undefined") {
   throw new Error("session storage is not properly configured.");
 }
 
-export const sessionStorage: SessionStorage = _sessionStorage
+export const sessionStorage: SessionStorage = _sessionStorage;
 
 export async function requireAuthSession(request: Request) {
-  const session = await sessionStorage.getSession(request.headers.get("Cookie"));
+  const session = await sessionStorage.getSession(
+    request.headers.get("Cookie")
+  );
   if (!session.has("userId")) {
     throw redirect("/login");
   }

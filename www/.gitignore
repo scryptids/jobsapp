@@ -1,6 +1,8 @@
+.DS_Store
 node_modules
 
 /.cache
+/.react-router
 /build
 /build-alt
 

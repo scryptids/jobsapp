@@ -3,7 +3,7 @@
  * @module
  */
 
-import { Link } from "@remix-run/react";
+import { Link } from "react-router";
 import classes from "./Header.module.css";
 
 interface HeaderProps {

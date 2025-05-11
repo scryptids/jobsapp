@@ -1,10 +1,8 @@
-import { ActionFunctionArgs, redirect } from "@remix-run/node";
-import { Form, Link } from "@remix-run/react";
+import { type ActionFunctionArgs, redirect } from "react-router";
+import { Form, Link } from "react-router";
 import { sessionStorage } from "../sessions";
 
-export const action = async ({
-  request,
-}: ActionFunctionArgs) => {
+export const action = async ({ request }: ActionFunctionArgs) => {
   const session = await sessionStorage.getSession(
     request.headers.get("Cookie")
   );

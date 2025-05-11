@@ -1,11 +1,9 @@
 {
   "include": [
-    "**/*.ts",
-    "**/*.tsx",
-    "**/.server/**/*.ts",
-    "**/.server/**/*.tsx",
-    "**/.client/**/*.ts",
-    "**/.client/**/*.tsx"
+    "**/*",
+    "**/.server/**/*",
+    "**/.client/**/*",
+    ".react-router/types/**/*"
   ],
   "compilerOptions": {
     "lib": [
@@ -14,21 +12,22 @@
       "ES2022"
     ],
     "types": [
-      "@remix-run/node",
+      "node",
       "vite/client",
       "vitest/importMeta"
     ],
-    "isolatedModules": true,
     "esModuleInterop": true,
     "jsx": "react-jsx",
-    "module": "ESNext",
-    "moduleResolution": "Bundler",
+    "module": "ES2022",
+    "moduleResolution": "bundler",
     "resolveJsonModule": true,
+    "verbatimModuleSyntax": false,
     "target": "ES2022",
     "strict": true,
     "allowJs": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
+    "rootDirs": [".", "./.react-router/types"],
     "baseUrl": ".",
     "paths": {
       "~/*": [
