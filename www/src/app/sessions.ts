@@ -7,7 +7,7 @@ import {
   type SessionStorage,
 } from "react-router";
 
-import { generateHasuraJWT } from "./auth";
+import { generateHasuraJWT } from "~/features/auth";
 
 type SessionData = {
   userId: string;

@@ -7,13 +7,17 @@
 
 import "@mantine/core/styles.css";
 
-import { data, type LoaderFunctionArgs } from "react-router";
+import {
+  data,
+  isRouteErrorResponse,
+  type LoaderFunctionArgs,
+} from "react-router";
 import {
   redirect,
   Links,
   Meta,
   Outlet,
-  Scripts,
+  // Scripts,
   ScrollRestoration,
   useLoaderData,
 } from "react-router";
@@ -24,8 +28,10 @@ import {
   createTheme,
 } from "@mantine/core";
 
-import { sessionStorage } from "~/sessions";
+import { sessionStorage } from "~/app/sessions";
 import { Header } from "~/components/Header/Header";
+import { homePath } from "./routes";
+import type { Route } from "./+types/root";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const session = await sessionStorage.getSession(
@@ -34,7 +40,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
   if (session.has("userId") && new URL(request.url).pathname === "/") {
     // Redirect to the home page if they are already signed in
-    throw redirect("/home");
+    throw redirect(homePath);
   }
 
   const _data = {
@@ -75,13 +81,14 @@ export function Layout({ children }: { children: React.ReactNode }) {
             padding="md"
           >
             <AppShell.Header>
-              <Header userId={data.userId} />
+              <Header userId={data?.userId} />
             </AppShell.Header>
             <AppShell.Main>{children}</AppShell.Main>
           </AppShell>
         </MantineProvider>
         <ScrollRestoration />
-        <Scripts />
+        {/* This <Scripts /> component is causing hydration mismatches */}
+        {/* <Scripts /> */}
       </body>
     </html>
   );
@@ -89,4 +96,33 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
 export default function App() {
   return <Outlet />;
+}
+
+export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
+  let message = "Oops!";
+  let details = "An unexpected error occurred.";
+  let stack: string | undefined;
+
+  if (isRouteErrorResponse(error)) {
+    message = error.status === 404 ? "404" : "Error";
+    details =
+      error.status === 404
+        ? "The requested page could not be found."
+        : error.statusText || details;
+  } else if (import.meta.env.DEV && error && error instanceof Error) {
+    details = error.message;
+    stack = error.stack;
+  }
+
+  return (
+    <div className="">
+      <h1>{message}</h1>
+      <p>{details}</p>
+      {stack && (
+        <pre className="">
+          <code>{stack}</code>
+        </pre>
+      )}
+    </div>
+  );
 }

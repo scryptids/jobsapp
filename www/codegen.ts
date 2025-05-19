@@ -1,9 +1,10 @@
-import { CodegenConfig } from '@graphql-codegen/cli'
+import { CodegenConfig } from "@graphql-codegen/cli";
 
-const endpoint = process.env.GRAPHQL_API_URL || 'http://localhost:8080/v1/graphql'
-const hasuraAdminSecret = process.env.HASURA_GRAPHQL_ADMIN_SECRET
+const endpoint =
+  process.env.GRAPHQL_API_URL || "http://localhost:8080/v1/graphql";
+const hasuraAdminSecret = process.env.HASURA_GRAPHQL_ADMIN_SECRET;
 if (!hasuraAdminSecret) {
-  throw new Error('HASURA_GRAPHQL_ADMIN_SECRET is required')
+  throw new Error("HASURA_GRAPHQL_ADMIN_SECRET is required");
 }
 
 const config: CodegenConfig = {
@@ -11,24 +12,22 @@ const config: CodegenConfig = {
     {
       [endpoint]: {
         headers: {
-          'x-hasura-admin-secret': hasuraAdminSecret
-        }
+          "x-hasura-admin-secret": hasuraAdminSecret,
+        },
       },
     },
   ],
-  documents: [
-    'app/**/*.graphql',
-  ],
+  documents: ["src/**/*.graphql"],
   ignoreNoDocuments: false,
   generates: {
-    './app/graphql/_generated.ts': {
+    "./src/graphql/_generated.ts": {
       plugins: [
-        'typescript',
-        'typescript-operations',
-        'typescript-graphql-request',
+        "typescript",
+        "typescript-operations",
+        "typescript-graphql-request",
       ],
     },
-  }
-}
+  },
+};
 
-export default config
+export default config;

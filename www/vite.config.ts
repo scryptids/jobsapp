@@ -6,8 +6,11 @@ import tsconfigPaths from "vite-tsconfig-paths";
 
 export default defineConfig({
   plugins: [reactRouter(), tsconfigPaths()],
+  build: {
+    sourcemap: true,
+  },
   test: {
-    includeSource: ["app/**/*.{js,ts}"],
+    includeSource: ["src/**/*.{js,ts}"],
   },
   define: {
     "import.meta.vitest": "undefined",

@@ -8,7 +8,8 @@
 import { type Session } from "react-router";
 import { setup, fromPromise, assign } from "xstate";
 
-import { initSession } from "~/sessions";
+import { initSession } from "src/app/sessions";
+import { homePath } from "~/app/routes";
 
 const _autologinMachine = setup({
   types: {
@@ -34,13 +35,13 @@ const _autologinMachine = setup({
         src: "initSession",
         input: ({ context: { session } }) => ({ session }),
         onDone: {
-          target: "/home",
+          target: homePath,
           // @ts-ignore
           actions: assign({ session: ({ event }) => event.output }),
         },
       },
     },
-    "/home": {
+    [homePath]: {
       type: "final",
       tags: ["success"],
     },

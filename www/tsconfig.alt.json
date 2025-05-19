@@ -2,6 +2,7 @@
   "extends": "./tsconfig.base.json",
   "exclude": [
     "codegen.ts",
+    "react-router-config.ts",
     "vite.config.ts"
   ],
   "compilerOptions": {
