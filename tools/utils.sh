@@ -17,6 +17,9 @@ confirm() {
     [yY])
       true
       ;;
+    [yY][eE][sS])
+      true
+      ;;
     *)
       false
       ;;

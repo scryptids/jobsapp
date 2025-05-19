@@ -33,27 +33,29 @@ do
   esac
 done
 
-# Stop and remove containers so that we can remove volumes without issue
+echo "Stopping and removing containers"
 docker compose down
 
 # Optionally remove postgres volume so we can run migration and seed without issue
-docker volume inspect "$PG_VOL_NAME" 2> /dev/null && confirm "Delete existing database volume: $PG_VOL_NAME" && {
+docker volume inspect "$PG_VOL_NAME" > /dev/null 2> /dev/null && confirm "Delete existing database volume: ${PG_VOL_NAME}?" && {
   docker volume rm "$PG_VOL_NAME"
 }
 
-# Create and run containers
+echo "Creating and running containers"
 docker compose up -d
 
-# Wait a bit for Hasura GraphQL engine to become ready
-sleep 5
+echo -n "Sleeping a bit to give Hasura time to become ready"
+for _ in {1..6}; do
+  sleep 1; echo -n "."
+done
+echo
 
-# Apply Hasura metadata, run migrations, then seed database
-pushd hasura
+echo "Applying Hasura metadata, running migrations, and seeding database"
+pushd hasura > /dev/null
 hasura metadata apply --envfile "$ENV_FILE_PATH" --endpoint "$GQL_ENDPOINT"
 hasura migrate apply --envfile "$ENV_FILE_PATH" --endpoint "$GQL_ENDPOINT" --database-name default
 hasura seed apply --envfile "$ENV_FILE_PATH" --endpoint "$GQL_ENDPOINT" --database-name default
 hasura metadata reload --envfile "$ENV_FILE_PATH" --endpoint "$GQL_ENDPOINT"
-popd
+popd > /dev/null
 
-# Open Hasura console in browser
-confirm "Open Hasura web console?" && open http://localhost:8080/console
+confirm "Open Hasura web console in browser?" && open http://localhost:8080/console
