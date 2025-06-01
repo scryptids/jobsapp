@@ -2,81 +2,72 @@
  * Job creation form
  * @module
  */
+import { Form, useFetcher } from "react-router";
 
+import { mergeForm, useTransform } from "@tanstack/react-form";
+import { initialFormState } from "@tanstack/react-form/remix";
+
+import { useAppForm as useJobCreationAppForm } from "~/features/jobs/hooks/job-creation-form";
 import {
-  useLoaderData,
-  useFetcher,
-  useLocation,
-  useSubmit,
-} from "react-router";
-import { useForm, type AnyFieldApi } from "@tanstack/react-form";
-import { Button } from "@mantine/core";
+  jobCreationFormOpts,
+  JobCreationFormValues,
+} from "~/features/jobs/components/JobCreationForm/shared-form";
+
+import { ActionData } from "~/app/routes/jobs-submit";
+
 import classes from "./JobCreationForm.css";
 
-function FieldInfo({ field }: { field: AnyFieldApi }) {
-  return (
-    <>
-      {field.state.meta.isTouched && !field.state.meta.isValid ? (
-        <em>{field.state.meta.errors.join(", ")}</em>
-      ) : null}
-      {field.state.meta.isValidating ? "Validating..." : null}
-    </>
-  );
-}
-
 export type JobCreationFormProps = {
-  onSubmit: () => void;
+  actionData: ActionData;
+  onSubmit: (value: JobCreationFormValues) => void;
 };
 
 export function JobCreationForm(props: JobCreationFormProps) {
-  const form = useForm({
-    defaultValues: {
-      title: "",
+  const { actionData } = props;
+
+  const formState = actionData ? { values: actionData } : initialFormState;
+  const jobCreationForm = useJobCreationAppForm({
+    ...jobCreationFormOpts,
+    transform: useTransform(
+      (baseForm) => mergeForm(baseForm, formState),
+      [actionData]
+    ),
+    validators: {
+      onChange: ({ value }) => {
+        console.log(value);
+        const errors = { fields: {} } as { fields: Record<string, string> };
+        if (!value.title) {
+          errors.fields.title = "A title is required";
+        }
+        return errors;
+      },
     },
-    onSubmit: async ({ value }) => {
-      props.onSubmit();
+    onSubmit: ({ value }) => {
+      console.log("onSubmit B");
+      props.onSubmit(value);
     },
   });
 
+  // it might be necessary to switch to using a data router in order to use react-router.Form
   return (
     <div>
       <form
+        action=""
         onSubmit={(e) => {
           e.preventDefault();
           e.stopPropagation();
-          form.handleSubmit();
+          console.log("onSubmit A");
+          jobCreationForm.handleSubmit();
         }}
+        method="post"
       >
-        <form.Field
+        <jobCreationForm.AppField
           name="title"
-          validators={{
-            onChange: ({ value }) =>
-              !value ? "A title is required" : undefined,
-          }}
-          children={(field) => {
-            return (
-              <>
-                <label htmlFor={field.name}>Title</label>
-                <input
-                  id={field.name}
-                  name={field.name}
-                  value={field.state.value}
-                  onBlur={field.handleBlur}
-                  onChange={(e) => field.handleChange(e.target.value)}
-                />
-                <FieldInfo field={field} />
-              </>
-            );
-          }}
+          children={(field) => <field.TextField label="Title" />}
         />
-        <form.Subscribe
-          selector={(state) => [state.canSubmit, state.isSubmitting]}
-          children={([canSubmit, isSubmitting]) => (
-            <Button type="submit" disabled={!canSubmit}>
-              {isSubmitting ? "..." : "Submit"}
-            </Button>
-          )}
-        />
+        <jobCreationForm.AppForm>
+          <jobCreationForm.SubscribeButton label="Submit" />
+        </jobCreationForm.AppForm>
       </form>
     </div>
   );

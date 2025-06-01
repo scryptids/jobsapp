@@ -3,19 +3,17 @@ import {
   Outlet,
   useLocation,
   useOutlet,
+  useLoaderData,
   type LoaderFunctionArgs,
 } from "react-router";
-import { useLoaderData, useLinkClickHandler } from "react-router";
-import { useDisclosure } from "@mantine/hooks";
-import { Button } from "@mantine/core";
 
 import { type Positions, type PositionsQuery } from "src/graphql/_generated";
-import { JobsTable, JobCreationForm } from "src/features/jobs/components";
+import { JobsTable } from "src/features/jobs/components";
 
 import { requireAuthSession, getSessionHasuraToken } from "src/app/sessions";
 import { sdk } from "~/api.server";
-// import { jobCreationModalPath } from "~/app/routes";
-import JobCreationModal from "~/features/jobs/components/JobCreationModal/JobCreationModal";
+import { jobCreationFormPath } from "~/app/routes";
+import CustomLink from "~/components/CustomLink/CustomLink";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const session = await requireAuthSession(request);
@@ -32,23 +30,18 @@ export async function loader({ request }: LoaderFunctionArgs) {
   }
 }
 
-export default function Posts() {
+export default function Dash() {
   const { positions } = useLoaderData<typeof loader>();
-  const [modalOpened, { open: openModal, close: closeModal }] =
-    useDisclosure(false);
-  // const handleJobCreationLinkClick = useLinkClickHandler(jobCreationModalPath);
 
   return (
     <>
-      <JobCreationModal opened={modalOpened} close={closeModal} />
       <div>
         <h1>Jobs</h1>
-        <Button onClick={openModal}>Add new job</Button>
-        {/* <Button component="a" onClick={handleJobCreationLinkClick}>
+        <CustomLink to={{ pathname: jobCreationFormPath }}>
           Add new job
-        </Button> */}
+        </CustomLink>
+
         <JobsTable jobsData={positions as Array<Positions>} />
-        <Outlet />
       </div>
     </>
   );

@@ -10,7 +10,7 @@ export const homePathSegment = "dash";
 export const jobsPathSegment = "jobs";
 
 export const homePath = `/${homePathSegment}`;
-// export const jobCreationModalPath = `/${homePathSegment}/${jobsPathSegment}/new`;
+export const jobCreationFormPath = `/${homePathSegment}/${jobsPathSegment}/new`;
 
 let appRoutes = [
   index("./routes/index.tsx"),
@@ -18,7 +18,10 @@ let appRoutes = [
   route("login", "./routes/login.tsx"),
   route("logout", "./routes/logout.tsx"),
 
-  ...prefix(homePathSegment, [index("./routes/dash.tsx")]),
+  ...prefix(homePathSegment, [
+    index("./routes/dash.tsx"),
+    ...prefix(jobsPathSegment, [route("new", "./routes/jobs-submit.tsx")]),
+  ]),
 ];
 
 if (import.meta.env.DEV) {
