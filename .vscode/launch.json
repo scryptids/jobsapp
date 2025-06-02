@@ -5,6 +5,12 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "name": "C#: DotnetBlazor [Default Configuration]",
+      "type": "dotnet",
+      "request": "launch",
+      "projectPath": "${workspaceFolder}/prototypes/DotnetBlazor/DotnetBlazor/DotnetBlazor.csproj"
+    },
+    {
       "type": "node",
       "request": "launch",
       "name": "Compile and launch gen-hasura-jwt script",
