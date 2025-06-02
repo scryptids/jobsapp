@@ -1,6 +1,11 @@
 # Job Application Tracker
 
-[Documentation website](https://scryptids.github.io/jobsapp/)
+## Notes
+
+- More experimentation is necessary to properly integrate TanStack Form and React Router
+- Need to figure out why `console.log` doesn't work as expected with client-side code. Also, having some React code run on the client and some on the server complicates the debugging story.
+- Hasura is a convenient tool for creating a GraphQL API server with minimal configuration, but for small projects it might be more ergonomic to keep all the "ORM" code in the same language and codebase. This also enables simpler deployments, with potentially only a single container for application code.
+- Recent releases of React Router seem to prioritize the non-SPA approach
 
 ## Running Hasura GraphQL Engine Locally
 
