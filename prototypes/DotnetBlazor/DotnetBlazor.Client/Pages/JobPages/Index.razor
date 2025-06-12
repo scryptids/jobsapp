@@ -1,0 +1,32 @@
+@page "/jobs"
+
+@using Microsoft.AspNetCore.Authorization
+@using DotnetBlazor.Client.Models
+@using DotnetBlazor.Client.Services
+@inject IJobService JobService
+
+@attribute [Authorize]
+
+<PageTitle>Jobs</PageTitle>
+
+@if (jobs == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <ul>
+        @foreach (var job in jobs) {
+            <li>@job.Title</li>
+        }
+    </ul>
+}
+
+@code {
+    private IEnumerable<JobDto>? jobs;
+
+    protected override async Task OnInitializedAsync()
+    {
+        jobs = await JobService.GetJobsAsync();
+    }
+}
