@@ -9,7 +9,7 @@ cd "${TOOLS_DIR}/.."
 declare -r SOURCE_DIR="$(pwd)"
 declare -r WEB_DIR="${SOURCE_DIR}/www"
 declare -r ENV_FILE_PATH="${WEB_DIR}/.env"
-declare -r PG_VOL_NAME="jobsapp_db_data"
+declare -r PG_VOL_NAME="react-router-hasura_db_data"
 declare -r GQL_ENDPOINT="http://localhost:8080"
 
 set -a
