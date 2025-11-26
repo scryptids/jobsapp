@@ -1,3 +1,5 @@
+// cSpell: ignore appspecific
+
 import {
   type RouteConfig,
   route,

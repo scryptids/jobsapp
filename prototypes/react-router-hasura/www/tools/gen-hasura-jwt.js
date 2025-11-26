@@ -1,6 +1,8 @@
 import { existsSync } from "fs";
 import { dirname, join } from "path";
+import process from "process";
 import { fileURLToPath } from "url";
+
 import { config } from "dotenv";
 
 import { generateHasuraJWT } from "~/features/auth/hasura.ts";
