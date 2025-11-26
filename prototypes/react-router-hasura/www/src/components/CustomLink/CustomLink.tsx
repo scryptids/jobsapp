@@ -17,7 +17,7 @@ import {
 export type CustomLinkProps = LinkProps;
 
 // stash our attempt to use the Mantine Button here for now
-const CustomLink = (props: CustomLinkProps) => {
+function CustomLink(props: CustomLinkProps) {
   // const linkClickHandler = useLinkClickHandler(jobCreationFormPath);
   // const handleJobCreationLinkClick = (
   //   e: React.MouseEvent<HTMLAnchorElement, MouseEvent>
@@ -31,7 +31,7 @@ const CustomLink = (props: CustomLinkProps) => {
   // );
 
   return <Link {...props} />;
-};
+}
 
 CustomLink.displayName = "CustomLink";
 

@@ -1,31 +1,34 @@
 import {
-  ActionFunctionArgs,
-  data,
-  Outlet,
-  redirect,
+  // ActionFunctionArgs,
+  // data,
+  // Outlet,
+  // redirect,
   useActionData,
   useFetcher,
-  useLinkClickHandler,
-  useLocation,
-  useOutlet,
-  useSubmit,
-  type LoaderFunctionArgs,
+  // useLinkClickHandler,
+  // useLocation,
+  // useOutlet,
+  // useSubmit,
+  // type LoaderFunctionArgs,
 } from "react-router";
-import { useLoaderData } from "react-router";
-import { Button } from "@mantine/core";
+// import { useLoaderData } from "react-router";
+// import { Button } from "@mantine/core";
 import {
   ServerFormState,
   ServerValidateError,
   createServerValidate,
-  formOptions,
+  // formOptions,
 } from "@tanstack/react-form/remix";
 
-import { type Positions, type PositionsQuery } from "src/graphql/_generated";
-import { JobCreationForm } from "src/features/jobs/components";
+// import { type Positions, type PositionsQuery } from "src/graphql/_generated";
+import JobCreationForm from "src/features/jobs/components/JobCreationForm/JobCreationForm";
 
-import { requireAuthSession, getSessionHasuraToken } from "src/app/sessions";
-import { sdk } from "~/api.server";
-import { homePathSegment, jobCreationFormPath } from "~/app/routes";
+// import { requireAuthSession, getSessionHasuraToken } from "src/app/sessions";
+// import { sdk } from "~/api.server";
+import {
+  // homePathSegment,
+  jobCreationFormPath,
+} from "~/app/routes";
 import { type Route } from "./+types";
 import {
   jobCreationFormOpts,

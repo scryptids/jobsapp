@@ -4,7 +4,7 @@ import {
   type RouteConfig,
   route,
   index,
-  layout,
+  // layout,
   prefix,
 } from "@react-router/dev/routes";
 

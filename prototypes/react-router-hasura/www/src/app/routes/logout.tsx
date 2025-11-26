@@ -18,7 +18,7 @@ export default function LogoutRoute() {
     <>
       <p>Are you sure you want to log out?</p>
       <Form method="post">
-        <button>Logout</button>
+        <button type="submit">Logout</button>
       </Form>
       <Link to="/">Never mind</Link>
     </>

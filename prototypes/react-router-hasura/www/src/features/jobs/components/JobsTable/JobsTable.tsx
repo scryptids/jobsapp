@@ -15,7 +15,7 @@ import classes from "./JobsTable.module.css";
 import { JobsTableRowMenu } from "../JobsTableRowMenu/JobsTableRowMenu";
 
 export interface JobsTableProps {
-  jobsData: Array<Positions>;
+  readonly jobsData: Array<Positions>;
 }
 
 export function JobsTable(props: JobsTableProps) {

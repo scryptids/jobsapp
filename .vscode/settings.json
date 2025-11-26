@@ -24,4 +24,14 @@
     "Blazor",
     "rendermode"
   ],
+  "cSpell.ignorePaths": [
+    "package-lock.json",
+    "node_modules",
+    "vscode-extension",
+    ".git/{info,lfs,logs,refs,objects}/**",
+    ".git/{index,*refs,*HEAD}",
+    ".vscode",
+    ".vscode-insiders",
+    "prototypes/react-router-hasura/www/src/graphql/_generated.ts"
+  ]
 }

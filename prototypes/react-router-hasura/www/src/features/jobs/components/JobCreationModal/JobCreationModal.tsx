@@ -6,20 +6,19 @@
 import { Modal } from "@mantine/core";
 
 import JobCreationForm from "../JobCreationForm/JobCreationForm";
+import { useCallback } from "react";
 
 export type JobCreationModalProps = {
-  opened: boolean;
-  close: () => void;
+  readonly opened: boolean;
+  readonly onClose: () => void;
 };
 
 export function JobCreationModal(props: JobCreationModalProps) {
+  const { onClose, opened } = props;
+  const onSubmit = useCallback(() => {}, []);
   return (
-    <Modal opened={props.opened} onClose={props.close}>
-      <JobCreationForm
-        onSubmit={() => {
-          // close();
-        }}
-      />
+    <Modal opened={opened} onClose={onClose}>
+      <JobCreationForm onSubmit={onSubmit} />
     </Modal>
   );
 }

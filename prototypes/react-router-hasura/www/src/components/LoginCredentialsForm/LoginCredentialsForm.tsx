@@ -2,35 +2,32 @@ import { Button, Container, TextInput } from "@mantine/core";
 import { Form, Link } from "react-router";
 
 export interface LoginCredentialsFormProps {
-  error?: string;
-  emailError?: string;
-  passwordError?: string;
+  readonly error?: string;
+  readonly emailError?: string;
+  readonly passwordError?: string;
 }
 
 export function LoginCredentialsForm(props: LoginCredentialsFormProps) {
+  const {
+    error = undefined,
+    emailError = undefined,
+    passwordError = undefined,
+  } = props;
   return (
     <Container size="sm">
-      <h2 id="login-header">
-        Log in
-      </h2>
-      {props.error ? <div className="error">{props.error}</div> : null}
+      <h2 id="login-header">Log in</h2>
+      {error ? <div className="error">{error}</div> : null}
       <Form method="post">
         <div>
           <TextInput
             autoFocus
-            error={props.emailError && (
-              <span id="email-error">
-                {props.emailError}
-              </span>
-            )}
+            error={emailError && <span id="email-error">{emailError}</span>}
             label="Email address"
             id="email"
             name="email"
             type="email"
             autoComplete="email"
-            aria-describedby={
-              props.emailError ? "email-error" : "login-header"
-            }
+            aria-describedby={emailError ? "email-error" : "login-header"}
             required
           />
         </div>
@@ -41,11 +38,9 @@ export function LoginCredentialsForm(props: LoginCredentialsFormProps) {
             name="password"
             type="password"
             label="Password"
-            error={props.passwordError && (
-              <span id="password-error">
-                {props.passwordError}
-              </span>
-            )}
+            error={
+              passwordError && <span id="password-error">{passwordError}</span>
+            }
             autoComplete="current-password"
             aria-describedby="password-error"
             required
@@ -60,9 +55,8 @@ export function LoginCredentialsForm(props: LoginCredentialsFormProps) {
           <Link className="underline" to="/signup">
             Sign up
           </Link>
-
         </div>
       </Form>
-    </Container >
-  )
+    </Container>
+  );
 }

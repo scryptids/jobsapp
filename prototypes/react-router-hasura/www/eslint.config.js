@@ -13,6 +13,7 @@ export default defineConfig([
   globalIgnores([
     "!**/.server",
     "!**/.client",
+    ".react-router/**/*",
     "build/**/*",
     "src/graphql/_generated.ts",
   ]),
@@ -129,6 +130,20 @@ export default defineConfig([
         typescript: {},
       },
     },
+    rules: {
+      ...reactPlugin.configs.flat.all.rules,
+      "react/jsx-filename-extension": [1, { extensions: [".jsx", ".tsx"] }],
+      "react/jsx-indent": "off",
+      "react/jsx-indent-props": "off",
+      "react/jsx-max-depth": [2, { max: 6 }],
+      "react/jsx-max-props-per-line": "off",
+      "react/jsx-newline": "off",
+      "react/jsx-no-literals": "off",
+      "react/jsx-no-useless-fragment": "off",
+      "react/jsx-one-expression-per-line": "off",
+      "react/jsx-sort-props": "off",
+      "react/react-in-jsx-scope": "off",
+    },
   },
 
   // Typescript
@@ -139,6 +154,20 @@ export default defineConfig([
       importPlugin.flatConfigs.recommended,
       importPlugin.flatConfigs.typescript,
     ],
+    rules: {
+      "@typescript-eslint/no-unused-vars": [
+        "error",
+        {
+          args: "all",
+          argsIgnorePattern: "^_",
+          caughtErrors: "all",
+          caughtErrorsIgnorePattern: "^_",
+          destructuredArrayIgnorePattern: "^_",
+          varsIgnorePattern: "^_",
+          ignoreRestSiblings: true,
+        },
+      ],
+    },
   },
   // {
   //   files: ["**/*.{ts,tsx}"],

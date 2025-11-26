@@ -8,7 +8,7 @@
  * @module
  */
 
-import { type Session } from "react-router";
+// import { type Session } from "react-router";
 import {
   createActor,
   setup,
@@ -37,10 +37,12 @@ function pausedOrDonePredicate(emitted: SnapshotFrom<AnyActorRef>): boolean {
 const DEFAULT_TIMEOUT = 2_000;
 
 export interface AsyncInterpretOptions {
-  timeoutMs?: number;
-  input?: Record<any, any>;
-  initialState?: Snapshot<any>;
-  initialEvent?: EventFromLogic<AnyActorLogic>;
+  readonly timeoutMs?: number;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  readonly input?: Record<any, any>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  readonly initialState?: Snapshot<any>;
+  readonly initialEvent?: EventFromLogic<AnyActorLogic>;
 }
 
 export async function asyncInterpret(
@@ -301,8 +303,8 @@ if (import.meta.vitest) {
         input: {} as { session: MockSession },
       },
       actors: {
-        initSession: fromPromise(async ({ input }) => {
-          // @ts-ignore
+        // @ts-expect-error just believe me
+        initSession: fromPromise(async ({ input }: unknown) => {
           input.session.userId = 1;
         }),
       },

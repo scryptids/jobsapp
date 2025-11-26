@@ -1,5 +1,6 @@
 import { TextInput } from "@mantine/core";
 import { useStore } from "@tanstack/react-form";
+import { useCallback } from "react";
 import { useFieldContext } from "~/hooks/form-context";
 
 export default function TextField({ label }: { label: string }) {
@@ -7,13 +8,17 @@ export default function TextField({ label }: { label: string }) {
 
   const errors = useStore(field.store, (state) => state.meta.errors);
 
+  const onChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    field.handleChange(e.target.value);
+  }, []);
+
   return (
     <div>
       <TextInput
         label={label}
         value={field.state.value}
         name={field.name}
-        onChange={(e) => field.handleChange(e.target.value)}
+        onChange={onChange}
       />
       {errors.map((error: string) => (
         <div key={error} style={{ color: "red" }}>

@@ -8,13 +8,13 @@ import classes from "./Header.module.css";
 import { homePath } from "~/app/routes";
 
 interface HeaderProps {
-  userId: string | null;
+  readonly userId: string | null;
 }
 
 export function Header(props: HeaderProps) {
   return (
     <div className={classes["header-nav__container"]}>
-      <Link to={homePath}>Home</Link>
+      <Link to={homePath}>{"Home"}</Link>
       <div>
         {props.userId ? (
           <form method="post" action="/logout">

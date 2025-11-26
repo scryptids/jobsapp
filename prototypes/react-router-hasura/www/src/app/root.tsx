@@ -1,3 +1,5 @@
+/* eslint-disable react/jsx-no-leaked-render */
+/* eslint-disable react/no-multi-comp */
 /**
  * Remix root route for rendering the app shell and header.
  * The root loader runs on the root path and all child routes.
@@ -54,8 +56,9 @@ export async function loader({ request }: LoaderFunctionArgs) {
   });
 }
 
+// eslint-disable-next-line react/prefer-read-only-props
 export function Layout({ children }: { children: React.ReactNode }) {
-  let data = useLoaderData<typeof loader>();
+  const data = useLoaderData<typeof loader>();
 
   // add color overrides or customizations here
   const theme = createTheme({});

@@ -1,14 +1,18 @@
+import { useCallback } from "react";
 import { Button, Menu, rem, useMantineTheme } from "@mantine/core";
 import { IconDots, IconTrash } from "@tabler/icons-react";
 import { Positions } from "src/graphql/_generated";
 
 export interface JobsTableRowMenuProps {
-  job: Positions;
-  deleteJob: (jobId: number) => void;
+  readonly deleteJob: (jobId: number) => void;
+  readonly job: Positions;
 }
 
 export function JobsTableRowMenu(props: JobsTableRowMenuProps) {
+  const { job, deleteJob: deleteJobCallback } = props;
+
   const theme = useMantineTheme();
+  const deleteJob = useCallback(() => deleteJobCallback(job.id), [job.id]);
   return (
     <Menu
       transitionProps={{ transition: "pop-top-right" }}
@@ -27,7 +31,7 @@ export function JobsTableRowMenu(props: JobsTableRowMenuProps) {
       </Menu.Target>
       <Menu.Dropdown>
         <Menu.Item
-          onClick={() => props.deleteJob(props.job.id)}
+          onClick={deleteJob}
           leftSection={
             <IconTrash
               style={{ width: rem(16), height: rem(16) }}

@@ -1,14 +1,14 @@
 import {
   data,
-  Outlet,
-  useLocation,
-  useOutlet,
+  // Outlet,
+  // useLocation,
+  // useOutlet,
   useLoaderData,
   type LoaderFunctionArgs,
 } from "react-router";
 
 import { type Positions, type PositionsQuery } from "src/graphql/_generated";
-import { JobsTable } from "src/features/jobs/components";
+import { JobsTable } from "src/features/jobs/components/JobsTable/JobsTable";
 
 import { requireAuthSession, getSessionHasuraToken } from "src/app/sessions";
 import { sdk } from "~/api.server";
@@ -24,7 +24,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
       authorization: `Bearer ${hasuraAccessToken}`,
     });
     return data(positions);
-  } catch (e) {
+  } catch (_) {
     const emptyResp: Pick<PositionsQuery, "positions"> = { positions: [] };
     return data(emptyResp);
   }
