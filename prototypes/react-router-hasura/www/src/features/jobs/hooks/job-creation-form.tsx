@@ -1,6 +1,6 @@
 import { lazy } from "react";
 import { Button } from "@mantine/core";
-import { createFormHook } from "@tanstack/react-form";
+import { createFormHook } from "@tanstack/react-form-remix";
 
 import {
   fieldContext,

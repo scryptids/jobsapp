@@ -18,7 +18,7 @@ import {
   ServerValidateError,
   createServerValidate,
   // formOptions,
-} from "@tanstack/react-form/remix";
+} from "@tanstack/react-form-remix";
 
 // import { type Positions, type PositionsQuery } from "src/graphql/_generated";
 import JobCreationForm from "src/features/jobs/components/JobCreationForm/JobCreationForm";

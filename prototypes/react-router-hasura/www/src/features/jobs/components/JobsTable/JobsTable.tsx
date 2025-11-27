@@ -55,7 +55,7 @@ export function JobsTable(props: JobsTableProps) {
                   ? null
                   : flexRender(
                       header.column.columnDef.header,
-                      header.getContext()
+                      header.getContext(),
                     )}
               </th>
             ))}

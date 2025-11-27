@@ -1,4 +1,4 @@
-import { formOptions } from "@tanstack/react-form/remix";
+import { formOptions } from "@tanstack/react-form-remix";
 
 export type JobCreationFormValues = {
   title: string;

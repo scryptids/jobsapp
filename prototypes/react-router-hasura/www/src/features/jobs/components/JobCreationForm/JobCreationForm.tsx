@@ -4,8 +4,11 @@
  */
 // import { Form, useFetcher } from "react-router";
 
-import { mergeForm, useTransform } from "@tanstack/react-form";
-import { initialFormState } from "@tanstack/react-form/remix";
+import {
+  mergeForm,
+  useTransform,
+  initialFormState,
+} from "@tanstack/react-form-remix";
 
 import { useAppForm as useJobCreationAppForm } from "~/features/jobs/hooks/job-creation-form";
 import {
@@ -31,7 +34,7 @@ function JobCreationForm(props: JobCreationFormProps) {
     ...jobCreationFormOpts,
     transform: useTransform(
       (baseForm) => mergeForm(baseForm, formState),
-      [actionData]
+      [actionData],
     ),
     validators: {
       onChange: ({ value }) => {

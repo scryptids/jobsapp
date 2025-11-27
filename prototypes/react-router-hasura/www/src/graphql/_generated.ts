@@ -1407,11 +1407,11 @@ const defaultWrapper: SdkFunctionWrapper = (action, _operationName, _operationTy
 
 export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = defaultWrapper) {
   return {
-    employers(variables: EmployersQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<EmployersQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<EmployersQuery>(EmployersDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'employers', 'query', variables);
+    employers(variables: EmployersQueryVariables, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit['signal']): Promise<EmployersQuery> {
+      return withWrapper((wrappedRequestHeaders) => client.request<EmployersQuery>({ document: EmployersDocument, variables, requestHeaders: { ...requestHeaders, ...wrappedRequestHeaders }, signal }), 'employers', 'query', variables);
     },
-    positions(variables?: PositionsQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<PositionsQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<PositionsQuery>(PositionsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'positions', 'query', variables);
+    positions(variables?: PositionsQueryVariables, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit['signal']): Promise<PositionsQuery> {
+      return withWrapper((wrappedRequestHeaders) => client.request<PositionsQuery>({ document: PositionsDocument, variables, requestHeaders: { ...requestHeaders, ...wrappedRequestHeaders }, signal }), 'positions', 'query', variables);
     }
   };
 }
