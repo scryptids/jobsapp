@@ -1,12 +1,11 @@
-import { GraphQLClient, RequestOptions } from 'graphql-request';
+/** Internal type. DO NOT USE DIRECTLY. */
+type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
+/** Internal type. DO NOT USE DIRECTLY. */
+export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never };
+import { GraphQLClient, type RequestOptions } from 'graphql-request';
 import gql from 'graphql-tag';
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
-export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
-export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
-export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
-export type MakeEmpty<T extends { [key: string]: unknown }, K extends keyof T> = { [_ in K]?: never };
-export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never };
 type GraphQLClientRequestHeaders = RequestOptions['requestHeaders'];
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
@@ -15,7 +14,7 @@ export type Scalars = {
   Boolean: { input: boolean; output: boolean; }
   Int: { input: number; output: number; }
   Float: { input: number; output: number; }
-  numeric: { input: any; output: any; }
+  numeric: { input: unknown; output: unknown; }
 };
 
 /** Boolean expression to compare columns of type "Int". All fields are combined with logical 'AND'. */
@@ -1365,19 +1364,19 @@ export type Users_Variance_Fields = {
 };
 
 export type EmployersQueryVariables = Exact<{
-  limit?: Scalars['Int']['input'];
-  user_id: Scalars['Int']['input'];
+  limit?: number;
+  user_id: number;
 }>;
 
 
-export type EmployersQuery = { __typename?: 'query_root', employers: Array<{ __typename?: 'employers', id: number, name: string }> };
+export type EmployersQuery = { employers: Array<{ id: number, name: string }> };
 
 export type PositionsQueryVariables = Exact<{
-  limit?: Scalars['Int']['input'];
+  limit?: number;
 }>;
 
 
-export type PositionsQuery = { __typename?: 'query_root', positions: Array<{ __typename?: 'positions', id: number, title: string, employer?: { __typename?: 'employers', name: string } | null }> };
+export type PositionsQuery = { positions: Array<{ id: number, title: string, employer: { name: string } | null }> };
 
 
 export const EmployersDocument = gql`

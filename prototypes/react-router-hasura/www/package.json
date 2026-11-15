@@ -39,10 +39,10 @@
     "xstate": "^5.13.1"
   },
   "devDependencies": {
-    "@graphql-codegen/cli": "^5.0.2",
-    "@graphql-codegen/typescript": "^4.0.6",
-    "@graphql-codegen/typescript-graphql-request": "^6.2.0",
-    "@graphql-codegen/typescript-operations": "^4.2.0",
+    "@graphql-codegen/cli": "^8.0.0",
+    "@graphql-codegen/typescript": "^7.0.1",
+    "@graphql-codegen/typescript-graphql-request": "^8.0.2",
+    "@graphql-codegen/typescript-operations": "^7.0.1",
     "@react-router/dev": "^7.9.6",
     "@types/react": "^19.1.5",
     "@types/react-dom": "^19.1.5",
