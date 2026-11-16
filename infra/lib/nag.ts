@@ -1,4 +1,4 @@
-import { Validations, type Stack } from "aws-cdk-lib";
+import { Token, Validations, type Stack } from "aws-cdk-lib";
 
 /**
  * Reviewed exceptions to the cdk-nag AwsSolutions pack. cdk-nag v3 needs
@@ -6,7 +6,9 @@ import { Validations, type Stack } from "aws-cdk-lib";
  * When a synth reports a new finding, review it before adding it here.
  */
 export function applyNagSuppressions(stack: Stack) {
-  const { account, region } = stack;
+  // cdk-nag renders unresolved pseudo-parameters like this in finding IDs.
+  const account = Token.isUnresolved(stack.account) ? "<AWS::AccountId>" : stack.account;
+  const region = Token.isUnresolved(stack.region) ? "<AWS::Region>" : stack.region;
   const bucket = "JobsappData:ExportsOutputFnGetAttReplicaBucketB570B599Arn0551B772";
   const opsTaskDefinition = `arn:<AWS::Partition>:ecs:${region}:${account}:task-definition/JobsappAppOpsTaskDef99369CA7:*`;
 

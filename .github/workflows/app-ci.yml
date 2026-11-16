@@ -1,0 +1,84 @@
+name: App CI
+
+on:
+  pull_request:
+    paths:
+      - "app/**"
+      - "infra/**"
+      - "compose.yaml"
+      - ".github/workflows/app-ci.yml"
+      - ".github/workflows/deploy.yml"
+  push:
+    branches: [main]
+    paths:
+      - "app/**"
+      - "infra/**"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: app-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  app:
+    name: App (lint, types, tests, build)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: app
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npx vitest run
+      - run: npm run build
+
+  infra:
+    name: Infra (types, tests, synth)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+          cache-dependency-path: |
+            app/package-lock.json
+            infra/package-lock.json
+      # The deploy hook bundles app/src/ops/control.ts, which needs app deps.
+      - run: npm ci
+        working-directory: app
+      - run: npm ci
+        working-directory: infra
+      - run: npx tsc --noEmit
+        working-directory: infra
+      - run: npx vitest run
+        working-directory: infra
+      # Without an image tag only the CI and data stacks synthesize, which
+      # needs no AWS credentials; the full app is covered by the tests.
+      - run: npx cdk synth --quiet
+        working-directory: infra
+        env:
+          CDK_DEFAULT_REGION: us-east-1
+
+  image:
+    name: Container image (arm64)
+    runs-on: ubuntu-24.04-arm
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
+      - uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
+        with:
+          context: app
+          platforms: linux/arm64
+          push: false
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
