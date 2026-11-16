@@ -20,14 +20,12 @@ import {
 
 import JobCreationForm from "src/features/jobs/components/JobCreationForm/JobCreationForm";
 import { JobSavedPrompt } from "src/features/jobs/components/JobSavedPrompt/JobSavedPrompt";
-import {
-  validateJobForm,
-  type JobCreationFormValues,
-} from "src/features/jobs/components/JobCreationForm/validation";
-import { createJob } from "src/features/jobs/createJob.server";
+import type { JobCreationFormValues } from "src/features/jobs/components/JobCreationForm/validation";
+import { createJobMachineFor } from "src/features/jobs/createJobMachine.server";
 import { requireAuthSession, getSessionHasuraToken } from "src/app/sessions";
 import { sdk } from "~/api.server";
 import { homePath, jobsListPath } from "~/app/routes";
+import { formDataToEvent, runMachineRequest } from "~/utils/machineRequest.server";
 import { returnToParam, safeReturnTo } from "~/utils/returnTo";
 
 export const meta: MetaFunction = () => [{ title: "Add a job" }];
@@ -71,30 +69,39 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
 export async function action({ request }: ActionFunctionArgs) {
   const session = await requireAuthSession(request);
-  const formData = await request.formData();
-  const values = Object.fromEntries(
-    formFields.map((name) => [name, String(formData.get(name) ?? "")])
-  ) as JobCreationFormValues;
-
-  // Mirrors the browser's checks; only reached if those were bypassed.
-  const fieldErrors = validateJobForm(values);
-  if (fieldErrors) {
+  const event = formDataToEvent(await request.formData(), ["job.submit"] as const);
+  if (!event) {
     return data(
-      { status: "invalid" as const, fieldErrors, job: null },
+      { status: "error" as const, fieldErrors: null, job: null },
       { status: 400 }
     );
   }
 
-  try {
-    const job = await createJob(values, getSessionHasuraToken(session));
-    return data({ status: "created" as const, fieldErrors: null, job });
-  } catch (e) {
-    console.error("Failed to create job", e);
+  const { snapshot } = await runMachineRequest({
+    machine: createJobMachineFor(getSessionHasuraToken(session)!),
+    request,
+    event: {
+      type: event.type,
+      ...(Object.fromEntries(
+        formFields.map((name) => [name, event[name] ?? ""])
+      ) as JobCreationFormValues),
+    },
+  });
+
+  if (snapshot.matches("created") && snapshot.output?.job) {
+    return data({ status: "created" as const, fieldErrors: null, job: snapshot.output.job });
+  }
+  if (snapshot.context.problem === "invalidInput" && snapshot.context.fieldErrors) {
+    // Mirrors the browser's checks; only reached if those were bypassed.
     return data(
-      { status: "error" as const, fieldErrors: null, job: null },
-      { status: 500 }
+      { status: "invalid" as const, fieldErrors: snapshot.context.fieldErrors, job: null },
+      { status: 400 }
     );
   }
+  return data(
+    { status: "error" as const, fieldErrors: null, job: null },
+    { status: 500 }
+  );
 }
 
 export default function NewJob() {
@@ -114,7 +121,8 @@ export default function NewJob() {
 
   const onSubmit = useCallback(
     (values: JobCreationFormValues) => {
-      fetcher.submit(values, { method: "post" });
+      // `type` is the event for the server-side create-job machine.
+      fetcher.submit({ ...values, type: "job.submit" }, { method: "post" });
     },
     [fetcher]
   );

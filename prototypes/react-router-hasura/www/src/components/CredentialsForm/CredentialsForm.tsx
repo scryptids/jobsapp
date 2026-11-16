@@ -41,6 +41,8 @@ export function CredentialsForm({
         </div>
       ) : null}
       <Form method="post">
+        {/* Event for the server-side state machine. */}
+        <input type="hidden" name="type" value="credentials.submit" />
         <TextInput
           autoFocus
           label="Email address"

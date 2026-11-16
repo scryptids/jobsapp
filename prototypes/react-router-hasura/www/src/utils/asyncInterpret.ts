@@ -45,21 +45,48 @@ export interface AsyncInterpretOptions {
   readonly initialEvent?: EventFromLogic<AnyActorLogic>;
 }
 
-export async function asyncInterpret(
-  logic: AnyActorLogic,
+export interface RunToPauseResult<TLogic extends AnyActorLogic> {
+  /** Snapshot once the actor paused (tag `pause`) or finished. */
+  readonly snapshot: SnapshotFrom<TLogic>;
+  /** Serializable form of `snapshot`, for resuming in a later request. */
+  readonly persistedSnapshot: Snapshot<unknown>;
+}
+
+/**
+ * Start an actor (optionally from a persisted snapshot), send it an optional
+ * event, and wait until it pauses for input or finishes. The actor is stopped
+ * afterwards, so nothing keeps running between requests.
+ */
+export async function runToPause<TLogic extends AnyActorLogic>(
+  logic: TLogic,
   options?: AsyncInterpretOptions
-) {
-  const actor = createActor(logic, {
+): Promise<RunToPauseResult<TLogic>> {
+  const actor = createActor(logic as AnyActorLogic, {
     snapshot: options?.initialState,
     input: options?.input,
   });
   actor.start();
-  if (options?.initialEvent) {
-    actor.send(options?.initialEvent);
+  try {
+    if (options?.initialEvent) {
+      actor.send(options.initialEvent);
+    }
+    const snapshot = await waitFor(actor, pausedOrDonePredicate, {
+      timeout: options?.timeoutMs ?? DEFAULT_TIMEOUT,
+    });
+    return {
+      snapshot: snapshot as SnapshotFrom<TLogic>,
+      persistedSnapshot: actor.getPersistedSnapshot(),
+    };
+  } finally {
+    actor.stop();
   }
-  return await waitFor(actor, pausedOrDonePredicate, {
-    timeout: options?.timeoutMs ?? DEFAULT_TIMEOUT,
-  });
+}
+
+export async function asyncInterpret(
+  logic: AnyActorLogic,
+  options?: AsyncInterpretOptions
+) {
+  return (await runToPause(logic, options)).snapshot;
 }
 
 if (import.meta.vitest) {

@@ -99,20 +99,23 @@ if (typeof _sessionStorage === "undefined") {
 export const sessionStorage: SessionStorage = _sessionStorage;
 
 /**
- * Start a session for `userId` and redirect, committing the session cookie.
+ * Start a session for `userId` and redirect, committing the session cookie
+ * along with any `extraSetCookies` (e.g. clearing a flow's machine cookie).
  */
 export async function createUserSessionRedirect(
   request: Request,
   userId: number,
-  redirectTo: string
+  redirectTo: string,
+  extraSetCookies: readonly string[] = []
 ) {
   const session = await initSession(
     await _sessionStorage.getSession(request.headers.get("Cookie")),
     userId
   );
-  return redirect(redirectTo, {
-    headers: { "Set-Cookie": await _sessionStorage.commitSession(session) },
-  });
+  const headers = new Headers();
+  headers.append("Set-Cookie", await _sessionStorage.commitSession(session));
+  for (const cookie of extraSetCookies) headers.append("Set-Cookie", cookie);
+  return redirect(redirectTo, { headers });
 }
 
 export async function requireAuthSession(request: Request) {

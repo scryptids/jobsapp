@@ -15,7 +15,8 @@
     "predev": "npm run codegen-compile",
     "test": "vitest",
     "gen-hasura-jwt": "ts-node --project tsconfig.alt.json -r tsconfig-paths/register \"./tools/gen-hasura-jwt.js\"",
-    "gen-v4-uuid": "ts-node --project tsconfig.alt.json -r tsconfig-paths/register \"./tools/gen-v4-uuid.js\""
+    "gen-v4-uuid": "ts-node --project tsconfig.alt.json -r tsconfig-paths/register \"./tools/gen-v4-uuid.js\"",
+    "smoke": "bash ./tools/smoke.sh"
   },
   "dependencies": {
     "@mantine/core": "^8.0.1",
