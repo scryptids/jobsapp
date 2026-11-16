@@ -1,43 +1,44 @@
 import { useCallback } from "react";
-import { Button, Menu, rem, useMantineTheme } from "@mantine/core";
+import { ActionIcon, Menu, rem } from "@mantine/core";
 import { IconDots, IconTrash } from "@tabler/icons-react";
 import { type JobRow } from "../JobsTable/JobsTable";
 
 export interface JobsTableRowMenuProps {
-  readonly deleteJob: (jobId: number) => void;
   readonly job: JobRow;
+  readonly onDelete: (job: JobRow) => void;
+  readonly deleteDisabled?: boolean;
 }
 
-export function JobsTableRowMenu(props: JobsTableRowMenuProps) {
-  const { job, deleteJob: deleteJobCallback } = props;
+export function JobsTableRowMenu({
+  job,
+  onDelete,
+  deleteDisabled = false,
+}: JobsTableRowMenuProps) {
+  const handleDelete = useCallback(() => onDelete(job), [onDelete, job]);
 
-  const theme = useMantineTheme();
-  const deleteJob = useCallback(() => deleteJobCallback(job.id), [job.id]);
   return (
     <Menu
       transitionProps={{ transition: "pop-top-right" }}
-      position="top-end"
+      position="bottom-end"
       width={220}
       withinPortal
     >
       <Menu.Target>
-        <Button variant="transparent">
-          <IconDots
-            style={{ width: rem(18), height: rem(18) }}
-            stroke={1.5}
-            color="black"
-          />
-        </Button>
+        <ActionIcon
+          variant="subtle"
+          color="gray"
+          aria-label={`Actions for ${job.title}`}
+        >
+          <IconDots style={{ width: rem(18), height: rem(18) }} stroke={1.5} />
+        </ActionIcon>
       </Menu.Target>
       <Menu.Dropdown>
         <Menu.Item
-          onClick={deleteJob}
+          color="red"
+          disabled={deleteDisabled}
+          onClick={handleDelete}
           leftSection={
-            <IconTrash
-              style={{ width: rem(16), height: rem(16) }}
-              color={theme.colors.red[6]}
-              stroke={1.5}
-            />
+            <IconTrash style={{ width: rem(16), height: rem(16) }} stroke={1.5} />
           }
         >
           Delete

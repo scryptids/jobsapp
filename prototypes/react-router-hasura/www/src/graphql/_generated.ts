@@ -245,6 +245,13 @@ export type InsertPositionMutationVariables = Exact<{
 
 export type InsertPositionMutation = { insert_positions_one: { id: number, title: string } | null };
 
+export type DeletePositionMutationVariables = Exact<{
+  id: number;
+}>;
+
+
+export type DeletePositionMutation = { delete_positions_by_pk: { id: number } | null };
+
 export type UserByEmailQueryVariables = Exact<{
   email: string;
 }>;
@@ -314,6 +321,13 @@ export const InsertPositionDocument = gql`
   }
 }
     `;
+export const DeletePositionDocument = gql`
+    mutation deletePosition($id: Int!) {
+  delete_positions_by_pk(id: $id) {
+    id
+  }
+}
+    `;
 export const UserByEmailDocument = gql`
     query userByEmail($email: String!) {
   users(where: {email: {_eq: $email}}, limit: 1) {
@@ -354,6 +368,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     insertPosition(variables: InsertPositionMutationVariables, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit['signal']): Promise<InsertPositionMutation> {
       return withWrapper((wrappedRequestHeaders) => client.request<InsertPositionMutation>({ document: InsertPositionDocument, variables, requestHeaders: { ...requestHeaders, ...wrappedRequestHeaders }, signal }), 'insertPosition', 'mutation', variables);
+    },
+    deletePosition(variables: DeletePositionMutationVariables, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit['signal']): Promise<DeletePositionMutation> {
+      return withWrapper((wrappedRequestHeaders) => client.request<DeletePositionMutation>({ document: DeletePositionDocument, variables, requestHeaders: { ...requestHeaders, ...wrappedRequestHeaders }, signal }), 'deletePosition', 'mutation', variables);
     },
     userByEmail(variables: UserByEmailQueryVariables, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit['signal']): Promise<UserByEmailQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<UserByEmailQuery>({ document: UserByEmailDocument, variables, requestHeaders: { ...requestHeaders, ...wrappedRequestHeaders }, signal }), 'userByEmail', 'query', variables);

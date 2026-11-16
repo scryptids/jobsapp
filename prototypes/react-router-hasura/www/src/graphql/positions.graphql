@@ -27,3 +27,12 @@ mutation insertPosition($object: positions_insert_input!) {
     title
   }
 }
+
+
+# Returns null when the job doesn't exist or isn't the caller's (Hasura's
+# delete permission filters by user).
+mutation deletePosition($id: Int!) {
+  delete_positions_by_pk(id: $id) {
+    id
+  }
+}
