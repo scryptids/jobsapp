@@ -1,48 +1,83 @@
 /**
  * This file contains functions for validating user input during the signup and login processes.
  *
+ * Checks that need the database (e.g. whether an email is already registered)
+ * live in `users.server.ts`.
  * @module
  */
 
-export async function accountExists(_email: string): Promise<boolean> {
-  await new Promise((resolve) => resolve(null));
-  return false;
+export const minPasswordLength = 8;
+
+export type CredentialErrors = { email?: string; password?: string };
+
+function validateEmail(email: string): string | undefined {
+  if (!email) return "Email is required.";
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+    return "Please enter a valid email address.";
+  }
+  return undefined;
 }
 
-export async function validateSignupCreds(email: string, password: string) {
-  const errors: { email?: string; password?: string } = {};
+export function validateSignupCreds(
+  email: string,
+  password: string
+): CredentialErrors | null {
+  const errors: CredentialErrors = {};
 
-  if (!email) {
-    errors.email = "Email is required.";
-  } else if (!email.includes("@")) {
-    errors.email = "Please enter a valid email address.";
-  }
+  const emailError = validateEmail(email);
+  if (emailError) errors.email = emailError;
 
   if (!password) {
     errors.password = "Password is required.";
-  }
-
-  if (!errors.email && (await accountExists(email))) {
-    errors.email = "An account with this email already exists.";
+  } else if (password.length < minPasswordLength) {
+    errors.password = `Password must be at least ${minPasswordLength} characters.`;
   }
 
   return Object.keys(errors).length ? errors : null;
 }
 
-export function validateLoginCreds(email: string, password: string) {
-  const errors: { email?: string; password?: string } = {};
+/**
+ * Login only checks presence/shape; password rules belong to sign-up so that
+ * changing them never locks out existing accounts.
+ */
+export function validateLoginCreds(
+  email: string,
+  password: string
+): CredentialErrors | null {
+  const errors: CredentialErrors = {};
 
-  if (!email) {
-    errors.email = "Email is required.";
-  } else if (!email.includes("@")) {
-    errors.email = "Please enter a valid email address.";
-  }
+  const emailError = validateEmail(email);
+  if (emailError) errors.email = emailError;
 
-  if (!password) {
-    errors.password = "Password is required.";
-  } else if (password.length < 6) {
-    errors.password = "Password must be at least 6 characters.";
-  }
+  if (!password) errors.password = "Password is required.";
 
   return Object.keys(errors).length ? errors : null;
+}
+
+if (import.meta.vitest) {
+  const { describe, it, expect } = import.meta.vitest;
+
+  describe("validateSignupCreds", () => {
+    it("accepts valid credentials", () => {
+      expect(validateSignupCreds("a@b.co", "longenough")).toBeNull();
+    });
+    it("requires email and password", () => {
+      expect(validateSignupCreds("", "")).toEqual({
+        email: "Email is required.",
+        password: "Password is required.",
+      });
+    });
+    it("rejects malformed email and short password", () => {
+      expect(validateSignupCreds("nope", "short")).toEqual({
+        email: "Please enter a valid email address.",
+        password: "Password must be at least 8 characters.",
+      });
+    });
+  });
+
+  describe("validateLoginCreds", () => {
+    it("does not enforce password length", () => {
+      expect(validateLoginCreds("a@b.co", "x")).toBeNull();
+    });
+  });
 }

@@ -20,6 +20,7 @@ let appRoutes = [
 
   route("login", "./routes/login.tsx"),
   route("logout", "./routes/logout.tsx"),
+  route("signup", "./routes/signup.tsx"),
 
   ...prefix(homePathSegment, [
     index("./routes/dash.tsx"),

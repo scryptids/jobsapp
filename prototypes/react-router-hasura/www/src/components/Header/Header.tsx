@@ -21,7 +21,9 @@ export function Header({ userId }: HeaderProps) {
             <button type="submit">Log out user {userId}</button>
           </form>
         ) : (
-          <Link to="/login">Log in</Link>
+          <>
+            <Link to="/login">Log in</Link> <Link to="/signup">Sign up</Link>
+          </>
         )}
       </div>
     </div>

@@ -1,65 +1,34 @@
-import { Button, Container, TextInput } from "@mantine/core";
-import { Form, Link } from "react-router";
+import { Link } from "react-router";
+
+import { CredentialsForm } from "../CredentialsForm/CredentialsForm";
 
 export interface LoginCredentialsFormProps {
+  readonly defaultEmail?: string;
   readonly error?: string;
   readonly emailError?: string;
   readonly passwordError?: string;
 }
 
 export function LoginCredentialsForm({
+  defaultEmail = undefined,
   error = undefined,
   emailError = undefined,
   passwordError = undefined,
 }: LoginCredentialsFormProps) {
   return (
-    <Container size="sm">
-      <h2 id="login-header">Log in</h2>
-      {error ? <div className="error">{error}</div> : null}
-      <Form method="post">
-        <div>
-          <TextInput
-            autoFocus
-            error={
-              emailError ? <span id="email-error">{emailError}</span> : null
-            }
-            label="Email address"
-            id="email"
-            name="email"
-            type="email"
-            autoComplete="email"
-            aria-describedby={emailError ? "email-error" : "login-header"}
-            required
-          />
-        </div>
-
-        <div>
-          <TextInput
-            id="password"
-            name="password"
-            type="password"
-            label="Password"
-            error={
-              passwordError ? (
-                <span id="password-error">{passwordError}</span>
-              ) : null
-            }
-            autoComplete="current-password"
-            aria-describedby="password-error"
-            required
-          />
-        </div>
-
-        <div>
-          <Button type="submit">Sign in</Button>
-        </div>
-        <div className="text-sm text-slate-500">
-          Don&apos;t have an account?{" "}
-          <Link className="underline" to="/signup">
-            Sign up
-          </Link>
-        </div>
-      </Form>
-    </Container>
+    <CredentialsForm
+      heading="Log in"
+      submitLabel="Log in"
+      passwordAutoComplete="current-password"
+      defaultEmail={defaultEmail}
+      error={error}
+      emailError={emailError}
+      passwordError={passwordError}
+      footer={
+        <p>
+          Don&apos;t have an account? <Link to="/signup">Sign up</Link>
+        </p>
+      }
+    />
   );
 }

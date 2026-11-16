@@ -1,0 +1,15 @@
+# Admin-only operations used by the auth flows. These run through `adminSdk`
+# (server-side, admin secret) because no user session exists yet.
+
+query userByEmail($email: String!) {
+  users(where: { email: { _eq: $email } }, limit: 1) {
+    id
+    password_hash
+  }
+}
+
+mutation insertUser($email: String!, $passwordHash: String!) {
+  insert_users_one(object: { email: $email, password_hash: $passwordHash }) {
+    id
+  }
+}

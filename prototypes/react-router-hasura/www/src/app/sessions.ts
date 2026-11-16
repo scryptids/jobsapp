@@ -98,6 +98,23 @@ if (typeof _sessionStorage === "undefined") {
 
 export const sessionStorage: SessionStorage = _sessionStorage;
 
+/**
+ * Start a session for `userId` and redirect, committing the session cookie.
+ */
+export async function createUserSessionRedirect(
+  request: Request,
+  userId: number,
+  redirectTo: string
+) {
+  const session = await initSession(
+    await _sessionStorage.getSession(request.headers.get("Cookie")),
+    userId
+  );
+  return redirect(redirectTo, {
+    headers: { "Set-Cookie": await _sessionStorage.commitSession(session) },
+  });
+}
+
 export async function requireAuthSession(request: Request) {
   const session = await sessionStorage.getSession(
     request.headers.get("Cookie")

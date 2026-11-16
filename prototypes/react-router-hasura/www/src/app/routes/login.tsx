@@ -1,15 +1,23 @@
 import {
+  data,
   redirect,
-  // redirectDocument,
+  useActionData,
+  type ActionFunctionArgs,
   type LoaderFunctionArgs,
+  type MetaFunction,
 } from "react-router";
 
 import { loginMachine } from "~/features/auth/loginMachine";
-// import { readLoginMachineCookie } from "./login.$state";
+import { isDevAutologinEnabled } from "~/features/auth/devAutologin.server";
+import { authenticateUser } from "~/features/auth/users.server";
+import { validateLoginCreds } from "~/features/auth/validation";
 import { asyncInterpret } from "~/utils/asyncInterpret";
 import { loginMachineCookie } from "~/app/cookies";
-import { sessionStorage } from "~/app/sessions";
+import { createUserSessionRedirect, sessionStorage } from "~/app/sessions";
 import { homePath } from "~/app/routes";
+import { LoginCredentialsForm } from "~/components/LoginCredentialsForm/LoginCredentialsForm";
+
+export const meta: MetaFunction = () => [{ title: "Log in" }];
 
 export async function loader({ request }: LoaderFunctionArgs) {
   let session = await sessionStorage.getSession(request.headers.get("Cookie"));
@@ -19,11 +27,15 @@ export async function loader({ request }: LoaderFunctionArgs) {
     return redirect(homePath);
   }
 
+  if (!isDevAutologinEnabled()) {
+    // Render the credentials form.
+    return null;
+  }
+
+  // Development convenience: sign in as the seeded user without credentials.
   try {
-    // const currentSnapshot = await readLoginMachineCookie(request);
     const loginMachineState = await asyncInterpret(loginMachine, {
       timeoutMs: 3_000,
-      // initialState: currentSnapshot,
       input: { session },
     });
 
@@ -63,6 +75,35 @@ export async function loader({ request }: LoaderFunctionArgs) {
   }
 }
 
-export default function Index() {
-  return null;
+export async function action({ request }: ActionFunctionArgs) {
+  const form = await request.formData();
+  const email = String(form.get("email") ?? "");
+  const password = String(form.get("password") ?? "");
+
+  const fieldErrors = validateLoginCreds(email, password);
+  if (fieldErrors) {
+    return data({ email, fieldErrors, error: undefined }, { status: 400 });
+  }
+
+  const userId = await authenticateUser(email, password);
+  if (userId === null) {
+    return data(
+      { email, fieldErrors: null, error: "Invalid email or password." },
+      { status: 401 }
+    );
+  }
+
+  return createUserSessionRedirect(request, userId, homePath);
+}
+
+export default function Login() {
+  const actionData = useActionData<typeof action>();
+  return (
+    <LoginCredentialsForm
+      defaultEmail={actionData?.email}
+      error={actionData?.error}
+      emailError={actionData?.fieldErrors?.email}
+      passwordError={actionData?.fieldErrors?.password}
+    />
+  );
 }

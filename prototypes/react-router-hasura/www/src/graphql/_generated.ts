@@ -15,6 +15,7 @@ export type Scalars = {
   Int: { input: number; output: number; }
   Float: { input: number; output: number; }
   numeric: { input: unknown; output: unknown; }
+  timestamptz: { input: unknown; output: unknown; }
 };
 
 /** Boolean expression to compare columns of type "Int". All fields are combined with logical 'AND'. */
@@ -1178,10 +1179,26 @@ export type Subscription_RootUsers_StreamArgs = {
   where?: InputMaybe<Users_Bool_Exp>;
 };
 
+/** Boolean expression to compare columns of type "timestamptz". All fields are combined with logical 'AND'. */
+export type Timestamptz_Comparison_Exp = {
+  _eq?: InputMaybe<Scalars['timestamptz']['input']>;
+  _gt?: InputMaybe<Scalars['timestamptz']['input']>;
+  _gte?: InputMaybe<Scalars['timestamptz']['input']>;
+  _in?: InputMaybe<Array<Scalars['timestamptz']['input']>>;
+  _is_null?: InputMaybe<Scalars['Boolean']['input']>;
+  _lt?: InputMaybe<Scalars['timestamptz']['input']>;
+  _lte?: InputMaybe<Scalars['timestamptz']['input']>;
+  _neq?: InputMaybe<Scalars['timestamptz']['input']>;
+  _nin?: InputMaybe<Array<Scalars['timestamptz']['input']>>;
+};
+
 /** columns and relationships of "users" */
 export type Users = {
   __typename?: 'users';
+  created_at: Scalars['timestamptz']['output'];
+  email?: Maybe<Scalars['String']['output']>;
   id: Scalars['Int']['output'];
+  password_hash?: Maybe<Scalars['String']['output']>;
 };
 
 /** aggregated selection of "users" */
@@ -1225,11 +1242,16 @@ export type Users_Bool_Exp = {
   _and?: InputMaybe<Array<Users_Bool_Exp>>;
   _not?: InputMaybe<Users_Bool_Exp>;
   _or?: InputMaybe<Array<Users_Bool_Exp>>;
+  created_at?: InputMaybe<Timestamptz_Comparison_Exp>;
+  email?: InputMaybe<String_Comparison_Exp>;
   id?: InputMaybe<Int_Comparison_Exp>;
+  password_hash?: InputMaybe<String_Comparison_Exp>;
 };
 
 /** unique or primary key constraints on table "users" */
 export enum Users_Constraint {
+  /** unique or primary key constraint on columns "email" */
+  UsersEmailKey = 'users_email_key',
   /** unique or primary key constraint on columns "id" */
   UsersPkey = 'users_pkey'
 }
@@ -1241,19 +1263,28 @@ export type Users_Inc_Input = {
 
 /** input type for inserting data into table "users" */
 export type Users_Insert_Input = {
+  created_at?: InputMaybe<Scalars['timestamptz']['input']>;
+  email?: InputMaybe<Scalars['String']['input']>;
   id?: InputMaybe<Scalars['Int']['input']>;
+  password_hash?: InputMaybe<Scalars['String']['input']>;
 };
 
 /** aggregate max on columns */
 export type Users_Max_Fields = {
   __typename?: 'users_max_fields';
+  created_at?: Maybe<Scalars['timestamptz']['output']>;
+  email?: Maybe<Scalars['String']['output']>;
   id?: Maybe<Scalars['Int']['output']>;
+  password_hash?: Maybe<Scalars['String']['output']>;
 };
 
 /** aggregate min on columns */
 export type Users_Min_Fields = {
   __typename?: 'users_min_fields';
+  created_at?: Maybe<Scalars['timestamptz']['output']>;
+  email?: Maybe<Scalars['String']['output']>;
   id?: Maybe<Scalars['Int']['output']>;
+  password_hash?: Maybe<Scalars['String']['output']>;
 };
 
 /** response of any mutation on the table "users" */
@@ -1274,7 +1305,10 @@ export type Users_On_Conflict = {
 
 /** Ordering options when selecting data from "users". */
 export type Users_Order_By = {
+  created_at?: InputMaybe<Order_By>;
+  email?: InputMaybe<Order_By>;
   id?: InputMaybe<Order_By>;
+  password_hash?: InputMaybe<Order_By>;
 };
 
 /** primary key columns input for table: users */
@@ -1285,12 +1319,21 @@ export type Users_Pk_Columns_Input = {
 /** select columns of table "users" */
 export enum Users_Select_Column {
   /** column name */
-  Id = 'id'
+  CreatedAt = 'created_at',
+  /** column name */
+  Email = 'email',
+  /** column name */
+  Id = 'id',
+  /** column name */
+  PasswordHash = 'password_hash'
 }
 
 /** input type for updating data in table "users" */
 export type Users_Set_Input = {
+  created_at?: InputMaybe<Scalars['timestamptz']['input']>;
+  email?: InputMaybe<Scalars['String']['input']>;
   id?: InputMaybe<Scalars['Int']['input']>;
+  password_hash?: InputMaybe<Scalars['String']['input']>;
 };
 
 /** aggregate stddev on columns */
@@ -1321,7 +1364,10 @@ export type Users_Stream_Cursor_Input = {
 
 /** Initial value of the column from where the streaming should start */
 export type Users_Stream_Cursor_Value_Input = {
+  created_at?: InputMaybe<Scalars['timestamptz']['input']>;
+  email?: InputMaybe<Scalars['String']['input']>;
   id?: InputMaybe<Scalars['Int']['input']>;
+  password_hash?: InputMaybe<Scalars['String']['input']>;
 };
 
 /** aggregate sum on columns */
@@ -1333,7 +1379,13 @@ export type Users_Sum_Fields = {
 /** update columns of table "users" */
 export enum Users_Update_Column {
   /** column name */
-  Id = 'id'
+  CreatedAt = 'created_at',
+  /** column name */
+  Email = 'email',
+  /** column name */
+  Id = 'id',
+  /** column name */
+  PasswordHash = 'password_hash'
 }
 
 export type Users_Updates = {
@@ -1386,6 +1438,21 @@ export type PositionsPageQueryVariables = Exact<{
 
 export type PositionsPageQuery = { positions: Array<{ id: number, title: string, employer: { name: string } | null }> };
 
+export type UserByEmailQueryVariables = Exact<{
+  email: string;
+}>;
+
+
+export type UserByEmailQuery = { users: Array<{ id: number, password_hash: string | null }> };
+
+export type InsertUserMutationVariables = Exact<{
+  email: string;
+  passwordHash: string;
+}>;
+
+
+export type InsertUserMutation = { insert_users_one: { id: number } | null };
+
 
 export const EmployersDocument = gql`
     query employers($limit: Int! = 10, $user_id: Int!) {
@@ -1417,6 +1484,21 @@ export const PositionsPageDocument = gql`
   }
 }
     `;
+export const UserByEmailDocument = gql`
+    query userByEmail($email: String!) {
+  users(where: {email: {_eq: $email}}, limit: 1) {
+    id
+    password_hash
+  }
+}
+    `;
+export const InsertUserDocument = gql`
+    mutation insertUser($email: String!, $passwordHash: String!) {
+  insert_users_one(object: {email: $email, password_hash: $passwordHash}) {
+    id
+  }
+}
+    `;
 
 export type SdkFunctionWrapper = <T>(action: (requestHeaders?:Record<string, string>) => Promise<T>, operationName: string, operationType?: string, variables?: any) => Promise<T>;
 
@@ -1433,6 +1515,12 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     positionsPage(variables: PositionsPageQueryVariables, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit['signal']): Promise<PositionsPageQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<PositionsPageQuery>({ document: PositionsPageDocument, variables, requestHeaders: { ...requestHeaders, ...wrappedRequestHeaders }, signal }), 'positionsPage', 'query', variables);
+    },
+    userByEmail(variables: UserByEmailQueryVariables, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit['signal']): Promise<UserByEmailQuery> {
+      return withWrapper((wrappedRequestHeaders) => client.request<UserByEmailQuery>({ document: UserByEmailDocument, variables, requestHeaders: { ...requestHeaders, ...wrappedRequestHeaders }, signal }), 'userByEmail', 'query', variables);
+    },
+    insertUser(variables: InsertUserMutationVariables, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit['signal']): Promise<InsertUserMutation> {
+      return withWrapper((wrappedRequestHeaders) => client.request<InsertUserMutation>({ document: InsertUserDocument, variables, requestHeaders: { ...requestHeaders, ...wrappedRequestHeaders }, signal }), 'insertUser', 'mutation', variables);
     }
   };
 }

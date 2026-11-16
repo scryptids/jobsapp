@@ -10,6 +10,7 @@ import { setup, fromPromise, assign } from "xstate";
 
 import { initSession } from "src/app/sessions";
 import { homePath } from "~/app/routes";
+import { devAutologinUserId } from "./devAutologin.server";
 
 const _autologinMachine = setup({
   types: {
@@ -18,7 +19,7 @@ const _autologinMachine = setup({
   },
   actors: {
     initSession: fromPromise<Session, { session: Session }>(({ input }) =>
-      initSession(input.session, 1)
+      initSession(input.session, devAutologinUserId)
     ),
   },
 }).createMachine({
