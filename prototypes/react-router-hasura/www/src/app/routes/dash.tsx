@@ -12,7 +12,7 @@ import { JobsTable } from "src/features/jobs/components/JobsTable/JobsTable";
 
 import { requireAuthSession, getSessionHasuraToken } from "src/app/sessions";
 import { sdk } from "~/api.server";
-import { jobCreationFormPath } from "~/app/routes";
+import { jobCreationFormPath, jobsListPath } from "~/app/routes";
 import CustomLink from "~/components/CustomLink/CustomLink";
 
 export async function loader({ request }: LoaderFunctionArgs) {
@@ -42,6 +42,7 @@ export default function Dash() {
         </CustomLink>
 
         <JobsTable jobsData={positions as Array<Positions>} />
+        <CustomLink to={jobsListPath}>View all</CustomLink>
       </div>
     </>
   );

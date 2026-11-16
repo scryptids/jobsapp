@@ -12,6 +12,7 @@ export const homePathSegment = "dash";
 export const jobsPathSegment = "jobs";
 
 export const homePath = `/${homePathSegment}`;
+export const jobsListPath = `/${homePathSegment}/${jobsPathSegment}`;
 export const jobCreationFormPath = `/${homePathSegment}/${jobsPathSegment}/new`;
 
 let appRoutes = [
@@ -22,7 +23,10 @@ let appRoutes = [
 
   ...prefix(homePathSegment, [
     index("./routes/dash.tsx"),
-    ...prefix(jobsPathSegment, [route("new", "./routes/jobs-submit.tsx")]),
+    ...prefix(jobsPathSegment, [
+      index("./routes/jobs-index.tsx"),
+      route("new", "./routes/jobs-submit.tsx"),
+    ]),
   ]),
 ];
 

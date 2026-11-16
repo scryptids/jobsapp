@@ -1378,6 +1378,14 @@ export type PositionsQueryVariables = Exact<{
 
 export type PositionsQuery = { positions: Array<{ id: number, title: string, employer: { name: string } | null }> };
 
+export type PositionsPageQueryVariables = Exact<{
+  limit: number;
+  offset: number;
+}>;
+
+
+export type PositionsPageQuery = { positions: Array<{ id: number, title: string, employer: { name: string } | null }> };
+
 
 export const EmployersDocument = gql`
     query employers($limit: Int! = 10, $user_id: Int!) {
@@ -1390,6 +1398,17 @@ export const EmployersDocument = gql`
 export const PositionsDocument = gql`
     query positions($limit: Int! = 10) {
   positions(limit: $limit) {
+    id
+    title
+    employer {
+      name
+    }
+  }
+}
+    `;
+export const PositionsPageDocument = gql`
+    query positionsPage($limit: Int!, $offset: Int!) {
+  positions(limit: $limit, offset: $offset, order_by: {id: asc}) {
     id
     title
     employer {
@@ -1411,6 +1430,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     positions(variables?: PositionsQueryVariables, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit['signal']): Promise<PositionsQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<PositionsQuery>({ document: PositionsDocument, variables, requestHeaders: { ...requestHeaders, ...wrappedRequestHeaders }, signal }), 'positions', 'query', variables);
+    },
+    positionsPage(variables: PositionsPageQueryVariables, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit['signal']): Promise<PositionsPageQuery> {
+      return withWrapper((wrappedRequestHeaders) => client.request<PositionsPageQuery>({ document: PositionsPageDocument, variables, requestHeaders: { ...requestHeaders, ...wrappedRequestHeaders }, signal }), 'positionsPage', 'query', variables);
     }
   };
 }

@@ -9,3 +9,13 @@ query positions($limit: Int! = 10) {
     }
   }
 }
+
+query positionsPage($limit: Int!, $offset: Int!) {
+  positions(limit: $limit, offset: $offset, order_by: { id: asc }) {
+    id
+    title
+    employer {
+      name
+    }
+  }
+}
