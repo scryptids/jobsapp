@@ -11,6 +11,7 @@ import {
   // useSubmit,
   // type LoaderFunctionArgs,
 } from "react-router";
+import { useCallback } from "react";
 // import { useLoaderData } from "react-router";
 // import { Button } from "@mantine/core";
 import {
@@ -78,19 +79,20 @@ export type ActionData = ReturnType<typeof useActionData<typeof action>>;
 export default function NewJob() {
   const actionData = useActionData<typeof action>();
   const fetcher = useFetcher();
+  const onSubmit = useCallback(
+    (value: JobCreationFormValues) => {
+      console.log("onSubmit C");
+      fetcher.submit(value, {
+        action: jobCreationFormPath,
+        method: "post",
+      });
+    },
+    [fetcher]
+  );
 
   return (
     <>
-      <JobCreationForm
-        actionData={actionData}
-        onSubmit={(value) => {
-          console.log("onSubmit C");
-          fetcher.submit(value, {
-            action: jobCreationFormPath,
-            method: "post",
-          });
-        }}
-      />
+      <JobCreationForm actionData={actionData} onSubmit={onSubmit} />
     </>
   );
 }

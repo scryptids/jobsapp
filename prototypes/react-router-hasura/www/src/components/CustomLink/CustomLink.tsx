@@ -30,6 +30,8 @@ function CustomLink(props: CustomLinkProps) {
   //   </Button>
   // );
 
+  // Thin wrapper: forwards every Link prop unchanged.
+  // eslint-disable-next-line react/jsx-props-no-spreading
   return <Link {...props} />;
 }
 

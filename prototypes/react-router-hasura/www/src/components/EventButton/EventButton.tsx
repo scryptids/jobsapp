@@ -1,10 +1,10 @@
 import { Form } from "react-router";
 
 export interface EventButtonProps {
-  children: React.ReactNode;
-  className?: string;
-  event: string;
-  payload?: Record<string, string>;
+  readonly children: React.ReactNode;
+  readonly className?: string;
+  readonly event: string;
+  readonly payload?: Record<string, string>;
 }
 
 /**
@@ -19,14 +19,19 @@ export interface EventButtonProps {
  * 
  * Adapted from https://github.com/erikras/remix-conf-2022/blob/main/app/components/EventButton.jsx
  */
-export function EventButton({ children, className, event, payload }: EventButtonProps) {
+export function EventButton({
+  children,
+  className = undefined,
+  event,
+  payload = undefined,
+}: EventButtonProps) {
   return (
     <Form method="post" className="inline">
-      {payload &&
-        Object.keys(payload).length > 0 &&
-        Object.entries(payload).map(([key, value]) => (
-          <input key={key} type="hidden" name={key} value={value} />
-        ))}
+      {payload
+        ? Object.entries(payload).map(([key, value]) => (
+            <input key={key} type="hidden" name={key} value={value} />
+          ))
+        : null}
       <input type="hidden" name="type" value={event} />
       <button type="submit" className={className}>
         {children}

@@ -4,7 +4,7 @@
  * @module
  */
 
-export async function accountExists(email: string): Promise<boolean> {
+export async function accountExists(_email: string): Promise<boolean> {
   await new Promise((resolve) => resolve(null));
   return false;
 }
@@ -30,7 +30,7 @@ export async function validateSignupCreds(email: string, password: string) {
 }
 
 export function validateLoginCreds(email: string, password: string) {
-  let errors: { email?: string; password?: string } = {};
+  const errors: { email?: string; password?: string } = {};
 
   if (!email) {
     errors.email = "Email is required.";

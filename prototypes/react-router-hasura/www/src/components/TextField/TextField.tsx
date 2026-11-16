@@ -3,7 +3,7 @@ import { useStore } from "@tanstack/react-form-remix";
 import { useCallback } from "react";
 import { useFieldContext } from "~/hooks/form-context";
 
-export default function TextField({ label }: { label: string }) {
+export default function TextField({ label }: { readonly label: string }) {
   const field = useFieldContext<string>();
 
   const errors = useStore(field.store, (state) => state.meta.errors);

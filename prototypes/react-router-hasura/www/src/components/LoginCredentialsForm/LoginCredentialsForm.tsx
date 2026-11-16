@@ -7,12 +7,11 @@ export interface LoginCredentialsFormProps {
   readonly passwordError?: string;
 }
 
-export function LoginCredentialsForm(props: LoginCredentialsFormProps) {
-  const {
-    error = undefined,
-    emailError = undefined,
-    passwordError = undefined,
-  } = props;
+export function LoginCredentialsForm({
+  error = undefined,
+  emailError = undefined,
+  passwordError = undefined,
+}: LoginCredentialsFormProps) {
   return (
     <Container size="sm">
       <h2 id="login-header">Log in</h2>
@@ -21,7 +20,9 @@ export function LoginCredentialsForm(props: LoginCredentialsFormProps) {
         <div>
           <TextInput
             autoFocus
-            error={emailError && <span id="email-error">{emailError}</span>}
+            error={
+              emailError ? <span id="email-error">{emailError}</span> : null
+            }
             label="Email address"
             id="email"
             name="email"
@@ -39,7 +40,9 @@ export function LoginCredentialsForm(props: LoginCredentialsFormProps) {
             type="password"
             label="Password"
             error={
-              passwordError && <span id="password-error">{passwordError}</span>
+              passwordError ? (
+                <span id="password-error">{passwordError}</span>
+              ) : null
             }
             autoComplete="current-password"
             aria-describedby="password-error"
@@ -51,7 +54,7 @@ export function LoginCredentialsForm(props: LoginCredentialsFormProps) {
           <Button type="submit">Sign in</Button>
         </div>
         <div className="text-sm text-slate-500">
-          Don't have an account?{" "}
+          Don&apos;t have an account?{" "}
           <Link className="underline" to="/signup">
             Sign up
           </Link>

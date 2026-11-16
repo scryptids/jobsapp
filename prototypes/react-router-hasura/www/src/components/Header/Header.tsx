@@ -11,14 +11,14 @@ interface HeaderProps {
   readonly userId: string | null;
 }
 
-export function Header(props: HeaderProps) {
+export function Header({ userId }: HeaderProps) {
   return (
     <div className={classes["header-nav__container"]}>
-      <Link to={homePath}>{"Home"}</Link>
+      <Link to={homePath}>Home</Link>
       <div>
-        {props.userId ? (
+        {userId ? (
           <form method="post" action="/logout">
-            <button>Log out user {props.userId}</button>
+            <button type="submit">Log out user {userId}</button>
           </form>
         ) : (
           <Link to="/login">Log in</Link>

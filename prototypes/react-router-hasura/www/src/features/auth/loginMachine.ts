@@ -17,10 +17,9 @@ const _autologinMachine = setup({
     input: {} as { session: Session },
   },
   actors: {
-    initSession: fromPromise(async ({ input }) => {
-      // @ts-ignore
-      return initSession(input.session, 1);
-    }),
+    initSession: fromPromise<Session, { session: Session }>(({ input }) =>
+      initSession(input.session, 1)
+    ),
   },
 }).createMachine({
   id: "auto_login_machine",
@@ -36,7 +35,6 @@ const _autologinMachine = setup({
         input: ({ context: { session } }) => ({ session }),
         onDone: {
           target: homePath,
-          // @ts-ignore
           actions: assign({ session: ({ event }) => event.output }),
         },
       },

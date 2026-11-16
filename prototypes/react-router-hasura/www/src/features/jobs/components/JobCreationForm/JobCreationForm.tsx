@@ -26,8 +26,10 @@ export type JobCreationFormProps = {
   readonly onSubmit: (value: JobCreationFormValues) => void;
 };
 
-function JobCreationForm(props: JobCreationFormProps) {
-  const { actionData, onSubmit: onSubmitCallback } = props;
+function JobCreationForm({
+  actionData = undefined,
+  onSubmit: onSubmitCallback,
+}: JobCreationFormProps) {
 
   const formState = actionData ? { values: actionData } : initialFormState;
   const jobCreationForm = useJobCreationAppForm({

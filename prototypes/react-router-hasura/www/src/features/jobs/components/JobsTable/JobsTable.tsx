@@ -18,11 +18,14 @@ export interface JobsTableProps {
   readonly jobsData: Array<Positions>;
 }
 
-export function JobsTable(props: JobsTableProps) {
-  const deleteJob = (jobId: number) => {
-    alert(`deleting ${jobId}`);
-  };
-  const columns: ColumnDef<Positions>[] = [
+/**
+ * Column definitions live outside the component so the cell renderer is not
+ * re-created as a new component type on every render.
+ */
+function buildColumns(
+  deleteJob: (jobId: number) => void
+): ColumnDef<Positions>[] {
+  return [
     {
       header: "Title",
       accessorKey: "title",
@@ -35,11 +38,22 @@ export function JobsTable(props: JobsTableProps) {
       id: "menu",
       header: () => null,
       accessorFn: (row) => row,
-      cell: ({ row }) => <JobsTableRowMenu job={row.original} deleteJob={deleteJob} />,
+      cell: ({ row }) => (
+        <JobsTableRowMenu job={row.original} deleteJob={deleteJob} />
+      ),
     },
   ];
+}
+
+function deleteJob(jobId: number) {
+  alert(`deleting ${jobId}`);
+}
+
+const columns = buildColumns(deleteJob);
+
+export function JobsTable({ jobsData }: JobsTableProps) {
   const table = useReactTable({
-    data: props.jobsData,
+    data: jobsData,
     columns,
     getCoreRowModel: getCoreRowModel(),
   });

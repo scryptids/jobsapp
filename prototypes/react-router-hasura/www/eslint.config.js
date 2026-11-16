@@ -143,6 +143,15 @@ export default defineConfig([
       "react/jsx-one-expression-per-line": "off",
       "react/jsx-sort-props": "off",
       "react/react-in-jsx-scope": "off",
+      // React 19 dropped defaultProps for function components; require
+      // default parameter values instead.
+      "react/require-default-props": [
+        "error",
+        { functions: "defaultArguments" },
+      ],
+      // Mantine components and react-router's Link accept className/style by
+      // design.
+      "react/forbid-component-props": "off",
     },
   },
 
