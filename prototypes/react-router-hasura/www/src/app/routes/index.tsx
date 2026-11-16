@@ -1,6 +1,8 @@
 import type { MetaFunction } from "react-router";
 import { Link } from "react-router";
 
+import { homePath } from "~/app/routes";
+
 export const meta: MetaFunction = () => {
   return [
     { title: "New Remix App" },
@@ -14,7 +16,7 @@ export default function Index() {
       <h1>Welcome to Remix</h1>
       <ul>
         <li>
-          <Link to="/positions">Jobs</Link>
+          <Link to={homePath}>Jobs</Link>
         </li>
         <li>
           <a
