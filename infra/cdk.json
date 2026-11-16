@@ -1,0 +1,26 @@
+{
+  "app": "npx tsx bin/jobsapp.ts",
+  "watch": {
+    "include": [
+      "bin/**",
+      "lib/**",
+      "lambda/**"
+    ]
+  },
+  "context": {
+    "jobsapp:appName": "jobsapp",
+    "jobsapp:domainName": "",
+    "jobsapp:hostedZoneId": "",
+    "jobsapp:hostedZoneName": "",
+    "jobsapp:alarmEmail": "",
+    "jobsapp:githubRepo": "scryptids/jobsapp",
+    "jobsapp:imageTag": "",
+    "jobsapp:enableWaf": true,
+    "jobsapp:monthlyBudgetUsd": 60,
+    "@aws-cdk/aws-iam:minimizePolicies": true,
+    "@aws-cdk/core:target-partitions": [
+      "aws"
+    ],
+    "@aws-cdk/core:defaultCrossStackReferences": "strong"
+  }
+}

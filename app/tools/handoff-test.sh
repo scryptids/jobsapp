@@ -78,7 +78,7 @@ page="$(jobs_page "$A")"
 echo "$page" | grep -q JobThree && ok "job three survived crash (RPO ≈ 1s)" || fail "job three lost in crash"
 
 echo "Point-in-time restore to before job three"
-result="$(ops restore --timestamp "$before_three")"
+result="$(ops restore --timestamp "$before_three" --mode apply)"
 echo "$result" | grep -q '"ok":true' && ok "restore ran" || fail "restore failed: $result"
 wait_role "$A" writer 60 && ok "app-a writer again" || fail "app-a not writer after restore"
 page="$(jobs_page "$A")"

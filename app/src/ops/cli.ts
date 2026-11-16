@@ -4,9 +4,9 @@
  *
  *   node build/ops.js status
  *   node build/ops.js verify
- *   node build/ops.js restore --timestamp 2026-11-15T10:30:00Z [--dry-run]
+ *   node build/ops.js restore --timestamp 2026-11-15T10:30:00Z [--mode dry-run|apply]
  *   node build/ops.js maintenance on --reason "..." | off
- *   node build/ops.js export [--timestamp ...] [--expires-minutes 15]
+ *   node build/ops.js export [--timestamp ...]
  *   node build/ops.js handoff [--reason ...]   (writer releases; any task may claim)
  *
  * Every command prints one JSON result line last, and exits non-zero on
@@ -19,8 +19,7 @@ import os from "node:os";
 import path from "node:path";
 import { parseArgs } from "node:util";
 
-import { GetObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3";
-import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import { PutObjectCommand } from "@aws-sdk/client-s3";
 
 import { assertIntegrity, openDatabase, runMigrations } from "~/db/client.server";
 import {
@@ -46,9 +45,8 @@ const { positionals, values } = parseArgs({
   allowPositionals: true,
   options: {
     timestamp: { type: "string" },
-    "dry-run": { type: "boolean", default: false },
+    mode: { type: "string", default: "dry-run" },
     reason: { type: "string", default: "operator request" },
-    "expires-minutes": { type: "string", default: "15" },
   },
 });
 
@@ -162,10 +160,13 @@ async function maintenance(mode: string | undefined) {
 async function restorePointInTime() {
   const at = parseTimestamp(values.timestamp);
   if (!at) throw new Error("--timestamp is required");
+  if (values.mode !== "dry-run" && values.mode !== "apply") {
+    throw new Error("--mode must be dry-run or apply");
+  }
 
   const checked = await restoreChecked(at);
   log("restored and verified", { generation: checked.generation, at, counts: checked.counts });
-  if (values["dry-run"]) {
+  if (values.mode === "dry-run") {
     fs.rmSync(path.dirname(checked.file), { recursive: true, force: true });
     return { dryRun: true, fromGeneration: checked.generation, at, counts: checked.counts };
   }
@@ -237,19 +238,24 @@ async function restorePointInTime() {
   };
 }
 
-/** Restore a copy and return a short-lived download link (approval-gated runbook). */
+/**
+ * Restore a copy into `exports/` in the replica bucket. Deliberately no
+ * presigned URL: logs are readable more widely than the data should be.
+ * The operator downloads it with their own IAM permissions (and KMS
+ * access); exports expire via the bucket lifecycle rule.
+ */
 async function exportDatabase() {
-  const minutes = Math.min(60, Math.max(1, Number(values["expires-minutes"])));
   const checked = await restoreChecked(parseTimestamp(values.timestamp));
   const key = `${store.prefix}exports/${new Date().toISOString().replace(/[:.]/g, "-")}.db`;
   await store.client.send(
     new PutObjectCommand({ Bucket: store.bucket, Key: key, Body: fs.readFileSync(checked.file) })
   );
   fs.rmSync(path.dirname(checked.file), { recursive: true, force: true });
-  const url = await getSignedUrl(store.client, new GetObjectCommand({ Bucket: store.bucket, Key: key }), {
-    expiresIn: minutes * 60,
-  });
-  return { key, expiresInMinutes: minutes, url, counts: checked.counts };
+  return {
+    key,
+    download: `aws s3 cp s3://${store.bucket}/${key} ./jobsapp-export.db`,
+    counts: checked.counts,
+  };
 }
 
 /** Ask the current writer to release; the next eligible task claims. */
