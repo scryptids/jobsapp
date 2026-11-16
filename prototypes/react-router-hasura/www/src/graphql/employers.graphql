@@ -7,3 +7,18 @@ query employers($limit: Int! = 10, $user_id: Int!) {
     name
   }
 }
+
+# The user role's select permission already limits rows to the caller's own.
+query myEmployers {
+  employers(order_by: { name: asc }) {
+    id
+    name
+  }
+}
+
+# Case-insensitive exact match: callers must escape %, _ and \ in $name.
+query employerByName($name: String!) {
+  employers(where: { name: { _ilike: $name } }, limit: 1) {
+    id
+  }
+}

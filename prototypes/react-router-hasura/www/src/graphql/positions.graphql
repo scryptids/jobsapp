@@ -19,3 +19,11 @@ query positionsPage($limit: Int!, $offset: Int!) {
     }
   }
 }
+
+
+mutation insertPosition($object: positions_insert_input!) {
+  insert_positions_one(object: $object) {
+    id
+    title
+  }
+}

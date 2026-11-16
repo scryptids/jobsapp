@@ -8,16 +8,17 @@ import {
   data,
   Link,
   useLoaderData,
+  useLocation,
   type LoaderFunctionArgs,
   type MetaFunction,
 } from "react-router";
 
-import { type Positions } from "src/graphql/_generated";
 import { JobsTable } from "src/features/jobs/components/JobsTable/JobsTable";
 
 import { requireAuthSession, getSessionHasuraToken } from "src/app/sessions";
 import { sdk } from "~/api.server";
 import { homePath, jobCreationFormPath, jobsListPath } from "~/app/routes";
+import { withReturnTo } from "~/utils/returnTo";
 
 const pageSize = 25;
 
@@ -56,15 +57,20 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
 export default function JobsIndex() {
   const { page, positions, hasNextPage } = useLoaderData<typeof loader>();
+  const location = useLocation();
 
   return (
     <div>
       <Link to={homePath}>&larr; Dashboard</Link>
       <h1>All jobs</h1>
-      <Link to={jobCreationFormPath}>Add new job</Link>
+      <Link
+        to={withReturnTo(jobCreationFormPath, location.pathname + location.search)}
+      >
+        Add new job
+      </Link>
 
       {positions.length > 0 ? (
-        <JobsTable jobsData={positions as Array<Positions>} />
+        <JobsTable jobsData={positions} />
       ) : (
         <p>{page > 1 ? "No jobs on this page." : "No jobs yet."}</p>
       )}

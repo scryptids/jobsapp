@@ -10,12 +10,15 @@ import {
   ColumnDef,
 } from "@tanstack/react-table";
 
-import { type Positions } from "src/graphql/_generated";
+import { type PositionsQuery } from "src/graphql/_generated";
 import classes from "./JobsTable.module.css";
 import { JobsTableRowMenu } from "../JobsTableRowMenu/JobsTableRowMenu";
 
+/** A job as returned by the positions queries. */
+export type JobRow = PositionsQuery["positions"][number];
+
 export interface JobsTableProps {
-  readonly jobsData: Array<Positions>;
+  readonly jobsData: JobRow[];
 }
 
 /**
@@ -24,15 +27,17 @@ export interface JobsTableProps {
  */
 function buildColumns(
   deleteJob: (jobId: number) => void
-): ColumnDef<Positions>[] {
+): ColumnDef<JobRow>[] {
   return [
     {
       header: "Title",
       accessorKey: "title",
     },
     {
+      id: "employer",
       header: "Employer",
-      accessorKey: "employer.name",
+      // Employer is optional; a nested accessorKey warns when it's null.
+      accessorFn: (row) => row.employer?.name ?? "",
     },
     {
       id: "menu",

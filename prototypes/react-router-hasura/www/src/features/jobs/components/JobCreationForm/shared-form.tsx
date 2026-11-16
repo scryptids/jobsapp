@@ -1,11 +1,15 @@
 import { formOptions } from "@tanstack/react-form-remix";
 
-export type JobCreationFormValues = {
-  title: string;
-};
+import { type JobCreationFormValues } from "./validation";
+
+export type { JobCreationFormValues } from "./validation";
 
 const defaultValues: JobCreationFormValues = {
   title: "",
+  employerName: "",
+  postingUrl: "",
+  payRangeLower: "",
+  payRangeUpper: "",
 };
 
 export const jobCreationFormOpts = formOptions({

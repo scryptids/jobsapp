@@ -4,16 +4,18 @@ import {
   // useLocation,
   // useOutlet,
   useLoaderData,
+  useLocation,
   type LoaderFunctionArgs,
 } from "react-router";
 
-import { type Positions, type PositionsQuery } from "src/graphql/_generated";
+import { type PositionsQuery } from "src/graphql/_generated";
 import { JobsTable } from "src/features/jobs/components/JobsTable/JobsTable";
 
 import { requireAuthSession, getSessionHasuraToken } from "src/app/sessions";
 import { sdk } from "~/api.server";
 import { jobCreationFormPath, jobsListPath } from "~/app/routes";
 import CustomLink from "~/components/CustomLink/CustomLink";
+import { withReturnTo } from "~/utils/returnTo";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const session = await requireAuthSession(request);
@@ -32,16 +34,22 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
 export default function Dash() {
   const { positions } = useLoaderData<typeof loader>();
+  const location = useLocation();
 
   return (
     <>
       <div>
         <h1>Jobs</h1>
-        <CustomLink to={{ pathname: jobCreationFormPath }}>
+        <CustomLink
+          to={withReturnTo(
+            jobCreationFormPath,
+            location.pathname + location.search
+          )}
+        >
           Add new job
         </CustomLink>
 
-        <JobsTable jobsData={positions as Array<Positions>} />
+        <JobsTable jobsData={positions} />
         <CustomLink to={jobsListPath}>View all</CustomLink>
       </div>
     </>

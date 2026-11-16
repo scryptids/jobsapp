@@ -1,11 +1,11 @@
 import { useCallback } from "react";
 import { Button, Menu, rem, useMantineTheme } from "@mantine/core";
 import { IconDots, IconTrash } from "@tabler/icons-react";
-import { Positions } from "src/graphql/_generated";
+import { type JobRow } from "../JobsTable/JobsTable";
 
 export interface JobsTableRowMenuProps {
   readonly deleteJob: (jobId: number) => void;
-  readonly job: Positions;
+  readonly job: JobRow;
 }
 
 export function JobsTableRowMenu(props: JobsTableRowMenuProps) {

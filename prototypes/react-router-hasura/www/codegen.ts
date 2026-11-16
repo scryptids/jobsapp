@@ -22,7 +22,6 @@ const config: CodegenConfig = {
   generates: {
     "./src/graphql/_generated.ts": {
       plugins: [
-        "typescript",
         "typescript-operations",
         "typescript-graphql-request",
       ],
