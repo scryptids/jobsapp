@@ -1,0 +1,1 @@
+-- Sequence resync is not reversible; nothing to undo.

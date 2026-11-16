@@ -9,11 +9,19 @@ insert_permissions:
   - role: user
     permission:
       check:
-        user_id:
-          _eq: X-Hasura-User-Id
+        _and:
+          - user_id:
+              _eq: X-Hasura-User-Id
+          - _or:
+              - employer_id:
+                  _is_null: true
+              - employer:
+                  user_id:
+                    _eq: X-Hasura-User-Id
+      set:
+        user_id: X-Hasura-User-Id
       columns:
         - employer_id
-        - id
         - pay_range_lower
         - pay_range_upper
         - posting_url
