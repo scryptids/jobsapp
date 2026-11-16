@@ -4,6 +4,12 @@ sidebar_position: 1
 
 # Hasura
 
+:::note
+This describes the Hasura prototype (`prototypes/react-router-hasura`). The app in
+`app/` uses SQLite, and every repository query is scoped to the signed-in user's id
+(see [Entity Relationships](../database/entity-relationships.md)).
+:::
+
 GraphQL queries issued server-side from Remix use a JSON Web Token (JWT) for authorization. The JWT payload looks like the following:
 
 ```json
