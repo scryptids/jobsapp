@@ -1,0 +1,90 @@
+# Local production-like stack: two app containers sharing one MinIO bucket,
+# to exercise writer handoff, crash recovery and point-in-time restore.
+#
+#   docker compose up --build -d
+#   ./app/tools/handoff-test.sh
+#   docker compose down -v
+#
+# app-a: http://localhost:8081   app-b: http://localhost:8082 (profile "b")
+# MinIO console: http://localhost:9001 (minioadmin / minioadmin)
+
+x-app: &app
+  build: ./app
+  read_only: true
+  tmpfs:
+    - /tmp
+  environment: &app-env
+    COOKIE_SECRETS: local-compose-secret
+    INSECURE_COOKIES: "true"
+    WRITER_COORDINATION: s3
+    REPLICA_BUCKET: jobsapp-local
+    S3_ENDPOINT: http://minio:9000
+    AWS_REGION: us-east-1
+    AWS_ACCESS_KEY_ID: minioadmin
+    AWS_SECRET_ACCESS_KEY: minioadmin
+  depends_on:
+    bucket:
+      condition: service_completed_successfully
+  stop_grace_period: 90s
+
+services:
+  minio:
+    image: minio/minio:RELEASE.2025-09-07T16-13-09Z
+    command: server /data --console-address :9001
+    ports: ["9000:9000", "9001:9001"]
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    volumes: [minio:/data]
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 2s
+      retries: 30
+
+  bucket:
+    image: minio/mc:RELEASE.2025-08-13T08-35-41Z
+    depends_on:
+      minio:
+        condition: service_healthy
+    entrypoint: >
+      sh -c "mc alias set local http://minio:9000 minioadmin minioadmin &&
+             mc mb --ignore-existing local/jobsapp-local &&
+             mc version enable local/jobsapp-local"
+
+  app-a:
+    <<: *app
+    ports: ["8081:8080"]
+    environment:
+      <<: *app-env
+      TASK_ID: app-a
+      TASK_DEFINITION: local:1
+    volumes: [data-a:/data]
+
+  app-b:
+    <<: *app
+    profiles: [b]
+    ports: ["8082:8080"]
+    environment:
+      <<: *app-env
+      TASK_ID: app-b
+      TASK_DEFINITION: local:2
+    volumes: [data-b:/data]
+
+  # One-off operator commands, like the runbooks' ECS tasks:
+  #   docker compose run --rm ops status
+  ops:
+    <<: *app
+    profiles: [ops]
+    entrypoint: ["/usr/bin/tini", "--", "/usr/local/bin/entrypoint.sh", "ops"]
+    command: ["status"]
+    environment:
+      <<: *app-env
+      TASK_ID: ops-local
+      TASK_DEFINITION: ops:1
+    volumes: [data-ops:/data]
+
+volumes:
+  minio:
+  data-a:
+  data-b:
+  data-ops:

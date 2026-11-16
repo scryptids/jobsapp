@@ -7,6 +7,7 @@
  *   node build/ops.js restore --timestamp 2026-11-15T10:30:00Z [--dry-run]
  *   node build/ops.js maintenance on --reason "..." | off
  *   node build/ops.js export [--timestamp ...] [--expires-minutes 15]
+ *   node build/ops.js handoff [--reason ...]   (writer releases; any task may claim)
  *
  * Every command prints one JSON result line last, and exits non-zero on
  * failure, so runbooks can surface it.
@@ -251,12 +252,31 @@ async function exportDatabase() {
   return { key, expiresInMinutes: minutes, url, counts: checked.counts };
 }
 
+/** Ask the current writer to release; the next eligible task claims. */
+async function handoff() {
+  const me = await resolveIdentity();
+  const before = await readControl(store);
+  const written = await updateControl(store, (doc) =>
+    doc ? handoffRequested(doc, { reason: values.reason!, by: me.taskArn }, new Date()) : null
+  );
+  if (!written) throw new Error("No control document; nothing has been deployed yet.");
+  for (let i = 0; i < 90; i++) {
+    const c = await readControl(store);
+    if (c && c.doc.state === "active" && c.doc.epoch > (before?.doc.epoch ?? 0)) {
+      return { writer: c.doc.writer?.taskArn, epoch: c.doc.epoch, generation: c.doc.generation };
+    }
+    await sleep(2000);
+  }
+  throw new Error("No task became the writer within 3 minutes.");
+}
+
 const commands: Record<string, () => Promise<unknown>> = {
   status,
   verify,
   restore: restorePointInTime,
   maintenance: () => maintenance(positionals[1]),
   export: exportDatabase,
+  handoff,
 };
 
 const command = commands[positionals[0] ?? ""];

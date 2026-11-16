@@ -6,7 +6,7 @@ import {
   type SessionStorage,
 } from "react-router";
 
-import { cookieSecrets } from "./cookies";
+import { cookieSecrets, secureCookies } from "./cookies";
 
 type SessionData = {
   userId: number;
@@ -33,7 +33,7 @@ const sessionCookie = createCookie("__session", {
   // 30 days
   maxAge: 30 * 24 * 60 * 60,
   httpOnly: true,
-  secure: process.env.NODE_ENV === "production",
+  secure: secureCookies(),
   sameSite: "lax",
 });
 

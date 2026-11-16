@@ -24,6 +24,12 @@ export function cookieSecrets(): string[] {
   return ["default-secret"];
 }
 let warnedInsecureSecret = false;
+
+/** Secure cookies in production, unless explicitly disabled for local plain-HTTP tests. */
+export function secureCookies(): boolean {
+  return process.env.NODE_ENV === "production" && process.env.INSECURE_COOKIES !== "true";
+}
+
 /** How long a paused multi-step flow (e.g. waiting for an OTP) stays alive. */
 export const machineCookieMaxAgeSeconds = 10 * 60;
 
@@ -36,7 +42,7 @@ export const loginMachineCookie = createCookie("_login", {
   secrets: cookieSecrets(),
   maxAge: machineCookieMaxAgeSeconds,
   httpOnly: true,
-  secure: process.env.NODE_ENV === "production",
+  secure: secureCookies(),
   sameSite: "lax",
   path: "/login",
 });
