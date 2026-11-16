@@ -22,7 +22,7 @@ import { useCallback } from "react";
 // import classes from "./JobCreationForm.css";
 
 export type JobCreationFormProps = {
-  readonly actionData: ActionData;
+  readonly actionData?: ActionData;
   readonly onSubmit: (value: JobCreationFormValues) => void;
 };
 

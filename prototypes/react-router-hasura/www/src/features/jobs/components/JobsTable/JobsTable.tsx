@@ -35,7 +35,7 @@ export function JobsTable(props: JobsTableProps) {
       id: "menu",
       header: () => null,
       accessorFn: (row) => row,
-      cell: ({ row }) => <JobsTableRowMenu job={row} deleteJob={deleteJob} />,
+      cell: ({ row }) => <JobsTableRowMenu job={row.original} deleteJob={deleteJob} />,
     },
   ];
   const table = useReactTable({
