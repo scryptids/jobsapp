@@ -19,7 +19,7 @@ import {
   Links,
   Meta,
   Outlet,
-  // Scripts,
+  Scripts,
   ScrollRestoration,
   useLoaderData,
 } from "react-router";
@@ -28,6 +28,7 @@ import {
   MantineProvider,
   AppShell,
   createTheme,
+  mantineHtmlProps,
 } from "@mantine/core";
 
 import { sessionStorage } from "~/app/sessions";
@@ -64,7 +65,10 @@ export function Layout({ children }: { children: React.ReactNode }) {
   const theme = createTheme({});
 
   return (
-    <html lang="en">
+    // mantineHtmlProps stops a hydration mismatch from the color-scheme
+    // attribute Mantine's script sets on <html> before React loads.
+    // eslint-disable-next-line react/jsx-props-no-spreading
+    <html lang="en" {...mantineHtmlProps}>
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -90,8 +94,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
           </AppShell>
         </MantineProvider>
         <ScrollRestoration />
-        {/* This <Scripts /> component is causing hydration mismatches */}
-        {/* <Scripts /> */}
+        <Scripts />
       </body>
     </html>
   );
