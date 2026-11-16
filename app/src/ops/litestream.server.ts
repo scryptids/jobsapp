@@ -14,7 +14,7 @@ export type LitestreamEnv = {
   bin: string;
   store: ControlStore;
   region?: string;
-  /** S3-compatible endpoint for local testing (MinIO). */
+  /** S3-compatible endpoint for local testing (LocalStack). */
   endpoint?: string;
   /** Where litestream POSTs after successful syncs, if set. */
   heartbeatUrl?: string;

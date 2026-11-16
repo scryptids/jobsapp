@@ -118,7 +118,7 @@ Generate migrations with `npm run db:generate` in `app/` and review the SQL.
 ## Local production-like testing
 
 ```sh
-docker compose up --build -d     # app-a + MinIO
+docker compose up --build -d     # app-a + LocalStack S3
 ./app/tools/handoff-test.sh      # handoff, crash takeover, point-in-time restore
 docker compose down -v
 ```

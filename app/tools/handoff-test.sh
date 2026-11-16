@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
 # End-to-end test of the writer protocol against the local compose stack
-# (two app containers + MinIO). Run from the repo root:
+# (two app containers + LocalStack S3). Run from the repo root:
 #
 #   docker compose down -v && docker compose up --build -d
 #   ./app/tools/handoff-test.sh
@@ -13,8 +13,8 @@
 # shellcheck disable=SC2015 # `ok` never fails, so A && ok || fail is safe here
 set -euo pipefail
 
-A=http://localhost:8081
-B=http://localhost:8082
+A=http://localhost:18081
+B=http://localhost:18082
 jar="$(mktemp)"
 trap 'rm -f "$jar"' EXIT
 failures=0
@@ -64,10 +64,16 @@ if [ "$during" = 503 ] || [ "$during" = 200 ]; then ok "write during handoff →
 wait_role "$B" writer 30 && ok "app-b became writer" || fail "app-b not writer"
 [ "$(role "$A")" = standby ] && ok "app-a is standby" || fail "app-a not standby"
 jobs_page "$B" | grep -q JobOne && ok "job one survived handoff" || fail "job one missing on app-b"
+if [ "$during" = 200 ]; then
+  jobs_page "$B" | grep -q DuringHandoff && ok "write accepted during handoff survived" || fail "write accepted during handoff was lost"
+fi
 check "write on a after handoff" "$(post "$A" /dash/jobs/new type=job.submit title=Nope)" 503
 check "create job two on b" "$(post "$B" /dash/jobs/new type=job.submit title=JobTwo)" 200
-before_three="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+# Litestream timestamps are upload times (~1s after commit, per file), and
+# `date` truncates to the second: leave margin on both sides of the mark.
 sleep 3
+before_three="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+sleep 2
 check "create job three on b" "$(post "$B" /dash/jobs/new type=job.submit title=JobThree)" 200
 sleep 3
 
@@ -83,6 +89,7 @@ echo "$result" | grep -q '"ok":true' && ok "restore ran" || fail "restore failed
 wait_role "$A" writer 60 && ok "app-a writer again" || fail "app-a not writer after restore"
 page="$(jobs_page "$A")"
 echo "$page" | grep -q JobTwo && ok "job two present" || fail "job two missing after restore"
+echo "$page" | grep -q JobOne && ok "job one present" || fail "job one missing after restore"
 echo "$page" | grep -q JobThree && fail "job three still present after restore" || ok "job three rolled back"
 
 echo

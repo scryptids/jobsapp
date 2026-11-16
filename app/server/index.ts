@@ -6,7 +6,7 @@
  * Endpoints outside the app:
  *   GET /healthz  200 once a database is open (any role); ALB health check.
  *   GET /readyz   coordinator status JSON; used by deploy hooks and runbooks.
- *   POST /_internal/litestream-heartbeat  litestream sync heartbeat (loopback only).
+ *   GET /_internal/litestream-heartbeat  litestream sync heartbeat (loopback only).
  */
 
 import path from "node:path";
@@ -40,7 +40,8 @@ app.get("/readyz", (_req, res) => {
   res.status(status.dbReady ? 200 : 503).json(status);
 });
 
-app.post("/_internal/litestream-heartbeat", (req, res) => {
+// Litestream pings this (GET, roughly every 15s) after successful syncs.
+app.all("/_internal/litestream-heartbeat", (req, res) => {
   const ip = req.socket.remoteAddress ?? "";
   if (!["127.0.0.1", "::1", "::ffff:127.0.0.1"].includes(ip)) {
     res.sendStatus(403);

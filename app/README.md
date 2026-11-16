@@ -47,6 +47,6 @@ maintenance).
 | `DATABASE_PATH` | SQLite file (standalone mode only) |
 | `WRITER_COORDINATION` | `s3` to enable the coordinator |
 | `REPLICA_BUCKET`, `REPLICA_PREFIX` | Where control docs and replicas live |
-| `S3_ENDPOINT` | S3-compatible endpoint (local MinIO only) |
+| `S3_ENDPOINT` | S3-compatible endpoint (local LocalStack only) |
 | `DATA_DIR` | Writable dir for database files (default `/data`) |
 | `LITESTREAM_HEARTBEAT_URL` | Litestream heartbeat target (set in the image) |
