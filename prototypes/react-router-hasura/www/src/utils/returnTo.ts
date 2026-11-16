@@ -21,6 +21,21 @@ export function safeReturnTo(
   return value;
 }
 
+/**
+ * Safe `returnTo` from a submitted form, or null when absent or unsafe.
+ * Tolerates requests without a form body.
+ */
+export async function readReturnTo(request: Request): Promise<string | null> {
+  let value: FormDataEntryValue | null = null;
+  try {
+    value = (await request.formData()).get(returnToParam);
+  } catch {
+    return null;
+  }
+  const safe = safeReturnTo(typeof value === "string" ? value : null, "");
+  return safe || null;
+}
+
 /** Build `path?returnTo=<from>`. */
 export function withReturnTo(path: string, from: string): string {
   return `${path}?${new URLSearchParams({ [returnToParam]: from })}`;

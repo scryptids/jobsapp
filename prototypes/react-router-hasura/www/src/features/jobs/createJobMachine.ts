@@ -47,9 +47,11 @@ export type InsertPositionInput = {
   employerId: number | null;
 };
 
-function valuesOf(event: CreateJobEvent): JobCreationFormValues {
+export function jobValuesOf(event: CreateJobEvent): JobCreationFormValues {
   const { title, employerName, postingUrl, payRangeLower, payRangeUpper } = event;
-  return { title, employerName, postingUrl, payRangeLower, payRangeUpper };
+  // Older clients may not send notes.
+  const notes = event.notes ?? "";
+  return { title, employerName, postingUrl, payRangeLower, payRangeUpper, notes };
 }
 
 export const createJobMachine = setup({
@@ -68,7 +70,7 @@ export const createJobMachine = setup({
     }),
   },
   guards: {
-    valuesInvalid: ({ event }) => validateJobForm(valuesOf(event)) !== null,
+    valuesInvalid: ({ event }) => validateJobForm(jobValuesOf(event)) !== null,
     noEmployerName: ({ context }) => !context.values?.employerName.trim(),
   },
 }).createMachine({
@@ -89,15 +91,15 @@ export const createJobMachine = setup({
           {
             guard: "valuesInvalid",
             actions: assign(({ event }) => ({
-              values: valuesOf(event),
-              fieldErrors: validateJobForm(valuesOf(event)),
+              values: jobValuesOf(event),
+              fieldErrors: validateJobForm(jobValuesOf(event)),
               problem: "invalidInput" as const,
             })),
           },
           {
             target: "checkingEmployer",
             actions: assign(({ event }) => ({
-              values: valuesOf(event),
+              values: jobValuesOf(event),
               employerId: null,
               fieldErrors: null,
               problem: null,

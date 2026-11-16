@@ -10,6 +10,7 @@ export type JobCreationFormValues = {
   postingUrl: string;
   payRangeLower: string;
   payRangeUpper: string;
+  notes: string;
 };
 
 export type JobCreationFieldErrors = Partial<
@@ -20,6 +21,8 @@ export type JobCreationFieldErrors = Partial<
 export const titleMaxLength = 100;
 export const employerNameMaxLength = 100;
 export const postingUrlMaxLength = 255;
+/** Notes are TEXT in the database; this just keeps them reasonable. */
+export const notesMaxLength = 5000;
 const payMax = 99_999_999.99; // NUMERIC(10, 2)
 
 /**
@@ -39,6 +42,18 @@ function validatePay(raw: string): string | undefined {
   if (Number.isNaN(pay)) return "Enter an amount like 85000 or 85,000.50.";
   if (pay > payMax) return "That amount is too large.";
   return undefined;
+}
+
+/** Error for notes longer than the limit, if any. Shared with employers. */
+export function validateNotes(raw: string): string | undefined {
+  return raw.trim().length > notesMaxLength
+    ? `Must be at most ${notesMaxLength.toLocaleString("en-US")} characters.`
+    : undefined;
+}
+
+/** Trimmed notes, or null when blank (stored as NULL). */
+export function normalizeNotes(raw: string): string | null {
+  return raw.trim() || null;
 }
 
 function validateUrl(raw: string): string | undefined {
@@ -88,6 +103,9 @@ export function validateJobForm(
     }
   }
 
+  const notesError = validateNotes(values.notes);
+  if (notesError) errors.notes = notesError;
+
   return Object.keys(errors).length ? errors : null;
 }
 
@@ -100,6 +118,7 @@ if (import.meta.vitest) {
     postingUrl: "",
     payRangeLower: "",
     payRangeUpper: "",
+    notes: "",
   };
 
   describe("parsePay", () => {
@@ -134,6 +153,12 @@ if (import.meta.vitest) {
       ).toEqual({
         title: "Must be at most 100 characters.",
         employerName: "Must be at most 100 characters.",
+      });
+    });
+    it("limits notes length", () => {
+      expect(validateJobForm({ ...valid, notes: "n".repeat(5000) })).toBeNull();
+      expect(validateJobForm({ ...valid, notes: "n".repeat(5001) })).toEqual({
+        notes: "Must be at most 5,000 characters.",
       });
     });
     it("only allows http(s) URLs", () => {

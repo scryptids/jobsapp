@@ -4,14 +4,15 @@ import { type JobCreationFormValues } from "./validation";
 
 export type { JobCreationFormValues } from "./validation";
 
-const defaultValues: JobCreationFormValues = {
+export const defaultJobFormValues: JobCreationFormValues = {
   title: "",
   employerName: "",
   postingUrl: "",
   payRangeLower: "",
   payRangeUpper: "",
+  notes: "",
 };
 
 export const jobCreationFormOpts = formOptions({
-  defaultValues,
+  defaultValues: defaultJobFormValues,
 });

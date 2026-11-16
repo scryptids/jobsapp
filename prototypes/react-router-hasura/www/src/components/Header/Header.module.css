@@ -5,3 +5,8 @@
     align-items: center;
     justify-content: space-between;
 }
+
+.header-nav__links {
+    display: flex;
+    gap: 1rem;
+}

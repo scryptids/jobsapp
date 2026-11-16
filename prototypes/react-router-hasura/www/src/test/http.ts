@@ -91,15 +91,25 @@ export function setCookieNames(result: unknown): string[] {
   return setCookiesOf(result).map((c) => c.slice(0, c.indexOf("=")).trim());
 }
 
+function isDataResult(value: unknown): value is DataResult<unknown> {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    (value as { type?: unknown }).type === "DataWithResponseInit"
+  );
+}
+
 /**
  * Run a loader or action and return what it produced. Thrown responses
- * (e.g. `throw redirect(...)`) are returned instead of rethrown.
+ * (e.g. `throw redirect(...)` or `throw data(null, { status: 404 })`) are
+ * returned instead of rethrown.
  */
 export async function run<T>(fn: () => Promise<T>): Promise<T | Response> {
   try {
     return await fn();
   } catch (e) {
     if (e instanceof Response) return e;
+    if (isDataResult(e)) return e as T;
     throw e;
   }
 }

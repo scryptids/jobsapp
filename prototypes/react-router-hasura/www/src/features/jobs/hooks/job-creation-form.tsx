@@ -8,6 +8,7 @@ import {
 } from "~/hooks/form-context";
 import TextField from "~/components/TextField/TextField";
 import AutocompleteField from "~/components/AutocompleteField/AutocompleteField";
+import TextareaField from "~/components/TextareaField/TextareaField";
 
 function SubscribeButton({
   label,
@@ -35,6 +36,7 @@ export const { useAppForm, withForm } = createFormHook({
   fieldComponents: {
     TextField,
     AutocompleteField,
+    TextareaField,
   },
   formComponents: {
     SubscribeButton,

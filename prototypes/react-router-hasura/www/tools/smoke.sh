@@ -56,6 +56,15 @@ expect "new account → 302 /dash" \
 expect "same email again → 409" \
   "$(post "$jar_dir/other" /signup type=credentials.submit "email=$email" "password=$password")" 409
 
+echo "Employers"
+employer_name="Smoke Co $RANDOM"
+created="$(post "$user" /dash/employers/new type=employer.submit "name=$employer_name" "notes=Smoke notes")"
+expect "create employer → 302 /dash/employers/<id>" "$created" 302
+employer_id="$(grep -oE '/dash/employers/[0-9]+$' <<<"$created" | grep -oE '[0-9]+$' || true)"
+expect "duplicate employer name → 409" \
+  "$(post "$user" /dash/employers/new type=employer.submit "name=$employer_name")" 409
+expect "employers list → 200" "$(get "$user" /dash/employers)" 200
+
 echo "Jobs"
 expect "dashboard → 200" "$(get "$user" /dash)" 200
 expect "invalid job → 400" \
@@ -63,16 +72,28 @@ expect "invalid job → 400" \
 # The .data endpoint returns the action result, so we can read the new id.
 job_id="$(curl -s -b "$user" -c "$user" -X POST "$base/dash/jobs/new.data" \
   --data-urlencode type=job.submit --data-urlencode "title=Smoke test job" \
-  --data-urlencode "employerName=Smoke Co" | grep -oE '"id",[0-9]+' | cut -d, -f2 || true)"
-if [[ -n "$job_id" ]]; then
+  --data-urlencode "employerName=$employer_name" | grep -oE '"id",[0-9]+' | cut -d, -f2 || true)"
+if [[ -n "$job_id" && -n "$employer_id" ]]; then
   printf '  ok    create job → id %s\n' "$job_id"
+  expect "job page → 200" "$(get "$user" "/dash/jobs/$job_id")" 200
+  expect "edit page → 200" "$(get "$user" "/dash/jobs/$job_id/edit")" 200
+  expect "edit job → 302 job page" \
+    "$(post "$user" "/dash/jobs/$job_id/edit" type=job.submit "title=Edited smoke job" \
+      "employerName=$employer_name" "notes=Smoke job notes")" 302 "/dash/jobs/$job_id"
+  expect "employer page → 200" "$(get "$user" "/dash/employers/$employer_id")" 200
+  expect "delete employer with a job → 409" \
+    "$(post "$user" "/dash/employers/$employer_id/delete")" 409
   expect "delete job → 200" "$(post "$user" "/dash/jobs/$job_id/delete")" 200
   expect "delete again → 404" "$(post "$user" "/dash/jobs/$job_id/delete")" 404
+  expect "job page after delete → 404" "$(get "$user" "/dash/jobs/$job_id")" 404
+  expect "delete employer without jobs → 200" \
+    "$(post "$user" "/dash/employers/$employer_id/delete")" 200
 else
-  printf '  FAIL  create job: no id in response\n'
+  printf '  FAIL  create job/employer: no id in response\n'
   failures=$((failures + 1))
 fi
 expect "malformed job id → 400" "$(post "$user" /dash/jobs/abc/delete)" 400
+expect "malformed employer id → 400" "$(post "$user" /dash/employers/abc/delete)" 400
 
 echo "Log out / log in"
 expect "log out → 302 /" "$(post "$user" /logout)" 302 /

@@ -1,10 +1,9 @@
 query positions($limit: Int! = 10) {
-  positions(
-    limit: $limit
-  ) {
+  positions(limit: $limit, order_by: { id: asc }) {
     id
     title
     employer {
+      id
       name
     }
   }
@@ -15,11 +14,27 @@ query positionsPage($limit: Int!, $offset: Int!) {
     id
     title
     employer {
+      id
       name
     }
   }
 }
 
+# Null when the job doesn't exist or isn't the caller's.
+query positionById($id: Int!) {
+  positions_by_pk(id: $id) {
+    id
+    title
+    posting_url
+    pay_range_lower
+    pay_range_upper
+    notes
+    employer {
+      id
+      name
+    }
+  }
+}
 
 mutation insertPosition($object: positions_insert_input!) {
   insert_positions_one(object: $object) {
@@ -28,6 +43,14 @@ mutation insertPosition($object: positions_insert_input!) {
   }
 }
 
+# Returns null when the job doesn't exist or isn't the caller's (Hasura's
+# update permission filters by user).
+mutation updatePosition($id: Int!, $set: positions_set_input!) {
+  update_positions_by_pk(pk_columns: { id: $id }, _set: $set) {
+    id
+    title
+  }
+}
 
 # Returns null when the job doesn't exist or isn't the caller's (Hasura's
 # delete permission filters by user).

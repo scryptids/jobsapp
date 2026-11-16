@@ -19,6 +19,7 @@ insert_permissions:
         user_id: X-Hasura-User-Id
       columns:
         - name
+        - notes
     comment: ""
 select_permissions:
   - role: user
@@ -26,6 +27,7 @@ select_permissions:
       columns:
         - id
         - name
+        - notes
       filter:
         user_id:
           _eq: X-Hasura-User-Id
@@ -34,8 +36,8 @@ update_permissions:
   - role: user
     permission:
       columns:
-        - id
         - name
+        - notes
       filter:
         user_id:
           _eq: X-Hasura-User-Id

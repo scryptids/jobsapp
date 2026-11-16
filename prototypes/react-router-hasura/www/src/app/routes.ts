@@ -10,11 +10,24 @@ import {
 
 export const homePathSegment = "dash";
 export const jobsPathSegment = "jobs";
+export const employersPathSegment = "employers";
 
 export const homePath = `/${homePathSegment}`;
+
 export const jobsListPath = `/${homePathSegment}/${jobsPathSegment}`;
+export const jobCreationFormPath = `${jobsListPath}/new`;
+export const jobDetailPath = (jobId: number) => `${jobsListPath}/${jobId}`;
+export const jobEditPath = (jobId: number) => `${jobsListPath}/${jobId}/edit`;
 export const jobDeletePath = (jobId: number) => `${jobsListPath}/${jobId}/delete`;
-export const jobCreationFormPath = `/${homePathSegment}/${jobsPathSegment}/new`;
+
+export const employersListPath = `/${homePathSegment}/${employersPathSegment}`;
+export const employerCreationFormPath = `${employersListPath}/new`;
+export const employerDetailPath = (employerId: number) =>
+  `${employersListPath}/${employerId}`;
+export const employerEditPath = (employerId: number) =>
+  `${employersListPath}/${employerId}/edit`;
+export const employerDeletePath = (employerId: number) =>
+  `${employersListPath}/${employerId}/delete`;
 
 let appRoutes = [
   index("./routes/index.tsx"),
@@ -28,7 +41,16 @@ let appRoutes = [
     ...prefix(jobsPathSegment, [
       index("./routes/jobs-index.tsx"),
       route("new", "./routes/jobs-submit.tsx"),
+      route(":jobId", "./routes/jobs-detail.tsx"),
+      route(":jobId/edit", "./routes/jobs-edit.tsx"),
       route(":jobId/delete", "./routes/jobs-delete.tsx"),
+    ]),
+    ...prefix(employersPathSegment, [
+      index("./routes/employers-index.tsx"),
+      route("new", "./routes/employers-submit.tsx"),
+      route(":employerId", "./routes/employers-detail.tsx"),
+      route(":employerId/edit", "./routes/employers-edit.tsx"),
+      route(":employerId/delete", "./routes/employers-delete.tsx"),
     ]),
   ]),
 ];

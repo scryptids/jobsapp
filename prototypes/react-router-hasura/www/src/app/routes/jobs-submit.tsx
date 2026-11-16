@@ -6,7 +6,7 @@
  * @module
  */
 
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { Alert } from "@mantine/core";
 import {
   data,
@@ -24,7 +24,8 @@ import type { JobCreationFormValues } from "src/features/jobs/components/JobCrea
 import { createJobMachineFor } from "src/features/jobs/createJobMachine.server";
 import { requireAuthSession, getSessionHasuraToken } from "src/app/sessions";
 import { sdk } from "~/api.server";
-import { homePath, jobsListPath } from "~/app/routes";
+import { homePath } from "~/app/routes";
+import { backLabel } from "~/app/navigation";
 import { formDataToEvent, runMachineRequest } from "~/utils/machineRequest.server";
 import { returnToParam, safeReturnTo } from "~/utils/returnTo";
 
@@ -36,14 +37,8 @@ const formFields = [
   "postingUrl",
   "payRangeLower",
   "payRangeUpper",
+  "notes",
 ] as const satisfies readonly (keyof JobCreationFormValues)[];
-
-function backLabel(returnTo: string): string {
-  const { pathname } = new URL(returnTo, "http://x");
-  if (pathname === homePath) return "Back to dashboard";
-  if (pathname === jobsListPath) return "Back to all jobs";
-  return "Go back";
-}
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const session = await requireAuthSession(request);
@@ -64,7 +59,10 @@ export async function loader({ request }: LoaderFunctionArgs) {
     console.error("Failed to load employers", e);
   }
 
-  return data({ returnTo, employerOptions });
+  // `?employer=` prefills the employer, e.g. from an employer's page.
+  const employerName = new URL(request.url).searchParams.get("employer") ?? "";
+
+  return data({ returnTo, employerOptions, employerName });
 }
 
 export async function action({ request }: ActionFunctionArgs) {
@@ -105,7 +103,7 @@ export async function action({ request }: ActionFunctionArgs) {
 }
 
 export default function NewJob() {
-  const { returnTo, employerOptions } = useLoaderData<typeof loader>();
+  const { returnTo, employerOptions, employerName } = useLoaderData<typeof loader>();
   const fetcher = useFetcher<typeof action>();
 
   // Remounting the form (new key) clears it for the next entry.
@@ -133,6 +131,10 @@ export default function NewJob() {
   }, [fetcher.data]);
 
   const label = backLabel(returnTo);
+  const initialValues = useMemo(
+    () => (employerName ? { employerName } : undefined),
+    [employerName]
+  );
 
   return (
     <div>
@@ -153,6 +155,7 @@ export default function NewJob() {
 
       <JobCreationForm
         key={formKey}
+        initialValues={initialValues}
         employerOptions={employerOptions}
         submitting={fetcher.state !== "idle"}
         onSubmit={onSubmit}

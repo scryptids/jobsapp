@@ -3,9 +3,9 @@
  * @module
  */
 
-import { useCallback, useMemo, useState } from "react";
-import { Alert } from "@mantine/core";
-import { useFetcher } from "react-router";
+import { useMemo } from "react";
+import { Anchor } from "@mantine/core";
+import { Link } from "react-router";
 import {
   useReactTable,
   getCoreRowModel,
@@ -15,11 +15,10 @@ import {
 } from "@tanstack/react-table";
 
 import { type PositionsQuery } from "src/graphql/_generated";
-import { jobDeletePath } from "~/app/routes";
-import { type action as deleteJobAction } from "~/app/routes/jobs-delete";
+import { employerDetailPath, jobDetailPath } from "~/app/routes";
+import { useJobDelete } from "~/features/jobs/hooks/useJobDelete";
 import classes from "./JobsTable.module.css";
 import { JobsTableRowMenu } from "../JobsTableRowMenu/JobsTableRowMenu";
-import { JobDeleteDialog } from "../JobDeleteDialog/JobDeleteDialog";
 
 /** A job as returned by the positions queries. */
 export type JobRow = PositionsQuery["positions"][number];
@@ -35,6 +34,8 @@ declare module "@tanstack/react-table" {
 
 export interface JobsTableProps {
   readonly jobsData: JobRow[];
+  /** Hide the employer column, e.g. on an employer's own page. */
+  readonly hideEmployer?: boolean;
 }
 
 /**
@@ -46,12 +47,25 @@ const columns: ColumnDef<JobRow>[] = [
   {
     header: "Title",
     accessorKey: "title",
+    cell: ({ row }) => (
+      <Anchor component={Link} to={jobDetailPath(row.original.id)}>
+        {row.original.title}
+      </Anchor>
+    ),
   },
   {
     id: "employer",
     header: "Employer",
     // Employer is optional; a nested accessorKey warns when it's null.
     accessorFn: (row) => row.employer?.name ?? "",
+    cell: ({ row }) => {
+      const { employer } = row.original;
+      return employer ? (
+        <Anchor component={Link} to={employerDetailPath(employer.id)}>
+          {employer.name}
+        </Anchor>
+      ) : null;
+    },
   },
   {
     id: "menu",
@@ -66,17 +80,8 @@ const columns: ColumnDef<JobRow>[] = [
   },
 ];
 
-export function JobsTable({ jobsData }: JobsTableProps) {
-  const deleteFetcher = useFetcher<typeof deleteJobAction>();
-  // Job awaiting confirmation in the dialog.
-  const [confirming, setConfirming] = useState<JobRow | null>(null);
-  // Last job submitted for deletion, for the error message.
-  const [lastDeleted, setLastDeleted] = useState<JobRow | null>(null);
-
-  const deleting = deleteFetcher.state !== "idle";
-  const deletingId = deleting ? lastDeleted?.id : undefined;
-  const failed =
-    !deleting && deleteFetcher.data?.ok === false && lastDeleted !== null;
+export function JobsTable({ jobsData, hideEmployer = false }: JobsTableProps) {
+  const { requestDelete, deleting, deletingId, alert, dialog } = useJobDelete();
 
   // Hide the row immediately; loaders revalidate once the delete lands, and
   // the row comes back if it failed.
@@ -85,40 +90,25 @@ export function JobsTable({ jobsData }: JobsTableProps) {
     [jobsData, deletingId]
   );
 
-  const confirmDelete = useCallback(() => {
-    if (!confirming) return;
-    setLastDeleted(confirming);
-    deleteFetcher.submit(null, {
-      method: "post",
-      action: jobDeletePath(confirming.id),
-    });
-    setConfirming(null);
-  }, [confirming, deleteFetcher]);
-
-  const cancelDelete = useCallback(() => setConfirming(null), []);
-
   const meta = useMemo(
-    () => ({ handleDelete: setConfirming, deleteDisabled: deleting }),
-    [deleting]
+    () => ({ handleDelete: requestDelete, deleteDisabled: deleting }),
+    [requestDelete, deleting]
   );
+
+  const columnVisibility = useMemo(() => ({ employer: !hideEmployer }), [hideEmployer]);
 
   const table = useReactTable({
     data: visibleJobs,
     columns,
     getCoreRowModel: getCoreRowModel(),
     getRowId: (row) => String(row.id),
+    state: { columnVisibility },
     meta,
   });
 
   return (
     <>
-      {failed ? (
-        <Alert color="red" title="Couldn't delete job" mb="md" role="alert">
-          {deleteFetcher.data?.reason === "not-found"
-            ? `${lastDeleted.title} no longer exists.`
-            : `${lastDeleted.title} wasn't deleted. Please try again.`}
-        </Alert>
-      ) : null}
+      {alert}
 
       <table className={classes.jobs_table}>
         <thead>
@@ -128,10 +118,7 @@ export function JobsTable({ jobsData }: JobsTableProps) {
                 <th key={header.id} className={classes.column_header}>
                   {header.isPlaceholder
                     ? null
-                    : flexRender(
-                        header.column.columnDef.header,
-                        header.getContext()
-                      )}
+                    : flexRender(header.column.columnDef.header, header.getContext())}
                 </th>
               ))}
             </tr>
@@ -150,11 +137,7 @@ export function JobsTable({ jobsData }: JobsTableProps) {
         </tbody>
       </table>
 
-      <JobDeleteDialog
-        jobTitle={confirming?.title ?? null}
-        onCancel={cancelDelete}
-        onConfirm={confirmDelete}
-      />
+      {dialog}
     </>
   );
 }

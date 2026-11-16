@@ -16,9 +16,70 @@ query myEmployers {
   }
 }
 
+query myEmployersWithJobCount {
+  employers(order_by: { name: asc }) {
+    id
+    name
+    positions_aggregate {
+      aggregate {
+        count
+      }
+    }
+  }
+}
+
+# Null when the employer doesn't exist or isn't the caller's.
+query employerById($id: Int!) {
+  employers_by_pk(id: $id) {
+    id
+    name
+    notes
+    positions(order_by: { id: asc }) {
+      id
+      title
+      employer {
+        id
+        name
+      }
+    }
+  }
+}
+
+# Null employer when it doesn't exist or isn't the caller's.
+query employerJobCount($id: Int!) {
+  employers_by_pk(id: $id) {
+    id
+    positions_aggregate {
+      aggregate {
+        count
+      }
+    }
+  }
+}
+
 # Case-insensitive exact match: callers must escape %, _ and \ in $name.
 query employerByName($name: String!) {
   employers(where: { name: { _ilike: $name } }, limit: 1) {
+    id
+  }
+}
+
+mutation insertEmployer($object: employers_insert_input!) {
+  insert_employers_one(object: $object) {
+    id
+    name
+  }
+}
+
+mutation updateEmployer($id: Int!, $set: employers_set_input!) {
+  update_employers_by_pk(pk_columns: { id: $id }, _set: $set) {
+    id
+    name
+  }
+}
+
+mutation deleteEmployer($id: Int!) {
+  delete_employers_by_pk(id: $id) {
     id
   }
 }

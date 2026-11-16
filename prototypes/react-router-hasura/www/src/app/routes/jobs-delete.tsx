@@ -1,17 +1,20 @@
 /**
  * Action-only route: POST /dash/jobs/:jobId/delete removes one of the
- * signed-in user's jobs. Submitted by the jobs table's row menu.
+ * signed-in user's jobs. Submitted by the jobs table's row menu and the job
+ * page. With a `returnTo` field, a successful delete redirects there.
  * @module
  */
 
-import { data, type ActionFunctionArgs } from "react-router";
+import { data, redirect, type ActionFunctionArgs } from "react-router";
 
 import { deleteJobMachineFor } from "src/features/jobs/deleteJobMachine.server";
 import { requireAuthSession, getSessionHasuraToken } from "src/app/sessions";
 import { runMachineRequest } from "~/utils/machineRequest.server";
+import { readReturnTo } from "~/utils/returnTo";
 
 export async function action({ request, params }: ActionFunctionArgs) {
   const session = await requireAuthSession(request);
+  const returnTo = await readReturnTo(request);
 
   const { snapshot } = await runMachineRequest({
     machine: deleteJobMachineFor(getSessionHasuraToken(session)!),
@@ -21,6 +24,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
   });
 
   if (snapshot.matches("deleted")) {
+    if (returnTo) throw redirect(returnTo);
     return data({ ok: true as const, reason: null });
   }
   if (snapshot.matches("invalid")) {

@@ -12,6 +12,8 @@ import {
 } from "~/test/http";
 import { action as deleteJob } from "./jobs-delete";
 import { action as submitJob, loader as newJobPage } from "./jobs-submit";
+import { loader as jobPage } from "./jobs-detail";
+import { action as editJob, loader as editJobPage } from "./jobs-edit";
 
 const fake = vi.hoisted(() => ({ sdk: undefined as unknown as FakeSdk }));
 vi.mock("~/api.server", async () => {
@@ -33,6 +35,7 @@ const job = (fields: Record<string, string>) => ({
   postingUrl: "",
   payRangeLower: "",
   payRangeUpper: "",
+  notes: "",
   ...fields,
 });
 
@@ -43,11 +46,11 @@ async function submit(fields: Record<string, string>, asUser = userId) {
   );
 }
 
-async function remove(jobId: string, asUser = userId) {
+async function remove(jobId: string, asUser = userId, fields: Record<string, string> = {}) {
   const cookie = await authedCookie(asUser);
   return run(() =>
     deleteJob({
-      request: formRequest(`/dash/jobs/${jobId}/delete`, {}, { cookie }),
+      request: formRequest(`/dash/jobs/${jobId}/delete`, fields, { cookie }),
       params: { jobId },
     } as never)
   );
@@ -135,7 +138,11 @@ describe("GET /dash/jobs/new", () => {
     const res = await newJobPage({
       request: getRequest("/dash/jobs/new?returnTo=//evil.test", { cookie }),
     } as never);
-    expect(dataOf(res)).toEqual({ returnTo: "/dash", employerOptions: ["Acme", "Zed"] });
+    expect(dataOf(res)).toEqual({
+      returnTo: "/dash",
+      employerOptions: ["Acme", "Zed"],
+      employerName: "",
+    });
   });
 });
 
@@ -166,5 +173,144 @@ describe("POST /dash/jobs/:jobId/delete", () => {
   it("returns 500 when the store fails", async () => {
     fake.sdk.failNext("deletePosition");
     expect(statusOf(await remove("1"))).toBe(500);
+  });
+});
+
+describe("POST /dash/jobs/:jobId/delete with returnTo", () => {
+  it("redirects after deleting", async () => {
+    const created = dataOf<SubmitData>(await submit({}));
+    const res = await remove(String(created.job!.id), userId, { returnTo: "/dash/jobs" });
+    expect(locationOf(res)).toBe("/dash/jobs");
+  });
+
+  it("ignores an off-site returnTo", async () => {
+    const created = dataOf<SubmitData>(await submit({}));
+    const res = await remove(String(created.job!.id), userId, { returnTo: "//evil.test" });
+    expect(statusOf(res)).toBe(200);
+  });
+});
+
+async function edit(jobId: string, fields: Record<string, string>, asUser = userId) {
+  const cookie = await authedCookie(asUser);
+  return run(() =>
+    editJob({
+      request: formRequest(`/dash/jobs/${jobId}/edit`, job(fields), { cookie }),
+      params: { jobId },
+    } as never)
+  );
+}
+
+async function load<T>(
+  loader: (args: never) => Promise<T>,
+  path: string,
+  params: Record<string, string>,
+  asUser = userId
+) {
+  const cookie = await authedCookie(asUser);
+  return run(() => loader({ request: getRequest(path, { cookie }), params } as never));
+}
+
+describe("GET /dash/jobs/:jobId", () => {
+  it("shows the user's job with its notes and employer", async () => {
+    const id = dataOf<SubmitData>(
+      await submit({ employerName: "Acme", notes: "Met Sam", payRangeLower: "5" })
+    ).job!.id;
+    const res = await load(jobPage, `/dash/jobs/${id}`, { jobId: String(id) });
+    expect(dataOf(res)).toMatchObject({
+      job: { id, notes: "Met Sam", pay_range_lower: 5, employer: { name: "Acme" } },
+    });
+  });
+
+  it.each([
+    ["another user's job", otherUserId],
+    ["a missing job", null],
+  ])("404s for %s", async (_, owner) => {
+    const id = owner ? dataOf<SubmitData>(await submit({}, owner)).job!.id : 999;
+    const res = await load(jobPage, `/dash/jobs/${id}`, { jobId: String(id) });
+    expect(statusOf(res)).toBe(404);
+  });
+
+  it("404s for a malformed id", async () => {
+    expect(statusOf(await load(jobPage, "/dash/jobs/x", { jobId: "x" }))).toBe(404);
+  });
+});
+
+describe("GET /dash/jobs/:jobId/edit", () => {
+  it("prefills the form from the job", async () => {
+    const id = dataOf<SubmitData>(
+      await submit({ employerName: "Acme", payRangeUpper: "120,000", notes: "n" })
+    ).job!.id;
+    const res = await load(editJobPage, `/dash/jobs/${id}/edit?returnTo=/dash`, {
+      jobId: String(id),
+    });
+    expect(dataOf(res)).toMatchObject({
+      returnTo: "/dash",
+      initialValues: {
+        title: "Engineer",
+        employerName: "Acme",
+        payRangeLower: "",
+        payRangeUpper: "120000",
+        notes: "n",
+      },
+      employerOptions: ["Acme"],
+    });
+  });
+
+  it("404s for another user's job", async () => {
+    const id = dataOf<SubmitData>(await submit({}, otherUserId)).job!.id;
+    const res = await load(editJobPage, `/dash/jobs/${id}/edit`, { jobId: String(id) });
+    expect(statusOf(res)).toBe(404);
+  });
+});
+
+describe("POST /dash/jobs/:jobId/edit", () => {
+  it("saves changes and notes, then returns to the job page", async () => {
+    const id = dataOf<SubmitData>(await submit({ employerName: "Acme" })).job!.id;
+    const res = await edit(String(id), {
+      title: "Staff Engineer",
+      employerName: "Acme",
+      notes: " Second interview Tuesday ",
+    });
+    expect(locationOf(res)).toBe(`/dash/jobs/${id}`);
+    expect(fake.sdk.db.positions[0]).toMatchObject({
+      title: "Staff Engineer",
+      notes: "Second interview Tuesday",
+    });
+    expect(fake.sdk.db.employers).toHaveLength(1);
+  });
+
+  it("follows a safe returnTo", async () => {
+    const id = dataOf<SubmitData>(await submit({})).job!.id;
+    const res = await edit(String(id), { returnTo: "/dash/jobs?page=2" });
+    expect(locationOf(res)).toBe("/dash/jobs?page=2");
+  });
+
+  it("moves the job to a new employer, or clears it", async () => {
+    const id = dataOf<SubmitData>(await submit({ employerName: "Acme" })).job!.id;
+    await edit(String(id), { employerName: "Newco" });
+    const newco = fake.sdk.db.employers.find((e) => e.name === "Newco")!;
+    expect(fake.sdk.db.positions[0].employer_id).toBe(newco.id);
+    await edit(String(id), { employerName: "" });
+    expect(fake.sdk.db.positions[0].employer_id).toBeNull();
+  });
+
+  it("returns 404 for another user's job and leaves it alone", async () => {
+    const id = dataOf<SubmitData>(await submit({}, otherUserId)).job!.id;
+    const res = await edit(String(id), { title: "Hijacked" });
+    expect(statusOf(res)).toBe(404);
+    expect(fake.sdk.db.positions[0].title).toBe("Engineer");
+  });
+
+  it("returns 400 for invalid values", async () => {
+    const id = dataOf<SubmitData>(await submit({})).job!.id;
+    const res = await edit(String(id), { title: "" });
+    expect(statusOf(res)).toBe(400);
+    expect(dataOf(res)).toMatchObject({ status: "invalid" });
+  });
+
+  it("returns 500 when saving fails", async () => {
+    const id = dataOf<SubmitData>(await submit({})).job!.id;
+    fake.sdk.failNext("updatePosition");
+    expect(statusOf(await edit(String(id), {}))).toBe(500);
   });
 });

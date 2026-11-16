@@ -33,6 +33,7 @@ const blank: JobCreationFormValues = {
   postingUrl: "",
   payRangeLower: "",
   payRangeUpper: "",
+  notes: "",
 };
 
 const submit = (values: Partial<JobCreationFormValues>) => ({

@@ -1,9 +1,9 @@
 /**
- * Job creation form
+ * Job form, used both to add a job and to edit one.
  * @module
  */
 
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { Group, SimpleGrid, Stack } from "@mantine/core";
 
 import { useAppForm as useJobCreationAppForm } from "~/features/jobs/hooks/job-creation-form";
@@ -16,6 +16,9 @@ import { validateJobForm } from "./validation";
 export type JobCreationFormProps = {
   /** Names of the user's existing employers, offered as suggestions. */
   readonly employerOptions: readonly string[];
+  /** Values to start from, e.g. the job being edited. */
+  readonly initialValues?: Partial<JobCreationFormValues>;
+  readonly submitLabel?: string;
   readonly submitting?: boolean;
   readonly onSubmit: (value: JobCreationFormValues) => void;
 };
@@ -27,11 +30,18 @@ function validate({ value }: { value: JobCreationFormValues }) {
 
 function JobCreationForm({
   employerOptions,
+  initialValues = undefined,
+  submitLabel = "Save job",
   submitting = false,
   onSubmit,
 }: JobCreationFormProps) {
+  const defaultValues = useMemo(
+    () => ({ ...jobCreationFormOpts.defaultValues, ...initialValues }),
+    [initialValues]
+  );
   const form = useJobCreationAppForm({
     ...jobCreationFormOpts,
+    defaultValues,
     validators: { onChange: validate, onSubmit: validate },
     onSubmit: ({ value }) => onSubmit(value),
   });
@@ -102,9 +112,18 @@ function JobCreationForm({
           </form.AppField>
         </SimpleGrid>
 
+        <form.AppField name="notes">
+          {(field) => (
+            <field.TextareaField
+              label="Notes"
+              placeholder="Contacts, interview dates, impressions…"
+            />
+          )}
+        </form.AppField>
+
         <Group>
           <form.AppForm>
-            <form.SubscribeButton label="Save job" busy={submitting} />
+            <form.SubscribeButton label={submitLabel} busy={submitting} />
           </form.AppForm>
         </Group>
       </Stack>

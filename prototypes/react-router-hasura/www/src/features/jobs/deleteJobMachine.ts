@@ -16,12 +16,9 @@
 
 import { fromPromise, setup } from "xstate";
 
-export type DeleteJobInput = { jobId: string | undefined };
+import { parseId } from "~/utils/parseId";
 
-function parseJobId(raw: string | undefined): number | null {
-  const id = Number(raw);
-  return Number.isInteger(id) && id > 0 ? id : null;
-}
+export type DeleteJobInput = { jobId: string | undefined };
 
 export const deleteJobMachine = setup({
   types: {
@@ -36,7 +33,7 @@ export const deleteJobMachine = setup({
   },
 }).createMachine({
   id: "deleteJob",
-  context: ({ input }) => ({ jobId: parseJobId(input.jobId) }),
+  context: ({ input }) => ({ jobId: parseId(input.jobId) }),
   initial: "validating",
   states: {
     validating: {

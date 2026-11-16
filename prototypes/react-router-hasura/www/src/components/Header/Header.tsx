@@ -5,7 +5,7 @@
 
 import { Link } from "react-router";
 import classes from "./Header.module.css";
-import { homePath } from "~/app/routes";
+import { employersListPath, homePath, jobsListPath } from "~/app/routes";
 
 interface HeaderProps {
   readonly userId: string | null;
@@ -14,7 +14,15 @@ interface HeaderProps {
 export function Header({ userId }: HeaderProps) {
   return (
     <div className={classes["header-nav__container"]}>
-      <Link to={homePath}>Home</Link>
+      <nav aria-label="Main" className={classes["header-nav__links"]}>
+        <Link to={homePath}>Home</Link>
+        {userId ? (
+          <>
+            <Link to={jobsListPath}>Jobs</Link>
+            <Link to={employersListPath}>Employers</Link>
+          </>
+        ) : null}
+      </nav>
       <div>
         {userId ? (
           <form method="post" action="/logout">
